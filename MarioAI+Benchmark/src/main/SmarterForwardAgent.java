@@ -72,7 +72,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	private boolean gapApproaching(byte[][] levelScenes) {
 		int fromX = receptiveFieldWidth / 2;
 	    int fromY = receptiveFieldHeight / 2;
-	    if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) == 0) {
+	    if (getReceptiveFieldCellValue(marioCenter[0] - 1, marioCenter[1] + 1) == 0) {
 	    	return true;
 	    }
 	    return false;
@@ -92,10 +92,14 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	 * @return: whether there is a wall immediately in front of us (true) or not (false)
 	 */
 	private boolean wallApproaching(byte[][] levelScenes) {
-		if (getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1]) != 0) {
+		if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) != 0) {
 	    	return true;
 	    }
 		return false;
+	}
+	
+	private boolean wallApproaching() {
+		return wallApproaching(levelScene);
 	}
 	
 	/**
@@ -161,10 +165,6 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	
 	private void printSurroundings() {
 		printSurroundings(2);
-	}
-	
-	private boolean wallApproaching() {
-		return wallApproaching(levelScene);
 	}
 	
 	public boolean[] getAction() {
