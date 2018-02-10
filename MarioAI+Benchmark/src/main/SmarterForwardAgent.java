@@ -78,46 +78,12 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 		printSurroundings(2);
 	}
 	
-	private boolean DangerOfGap(byte[][] levelScene) {
-	    int fromX = receptiveFieldWidth / 2;
-	    int fromY = receptiveFieldHeight / 2;
-	
-	    if (fromX > 3)
-	    {
-	        fromX -= 2;
-	    }
-	
-	    for (int x = fromX; x < receptiveFieldWidth; ++x)
-	    {
-	        boolean f = true;
-	        for (int y = fromY; y < receptiveFieldHeight; ++y)
-	        {
-	            if (getReceptiveFieldCellValue(y, x) != 0)
-	                f = false;
-	        }
-	        if (f ||
-	                getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1]) == 0 ||
-	                (marioState[1] > 0 &&
-	                        (getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1] - 1) != 0 ||
-	                                getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1]) != 0)))
-	            return true;
-	    }
-	    return false;
-	}
-	
-	private boolean DangerOfGap()
-	{
-	    return DangerOfGap(levelScene);
-	}
-	
 	/**
 	 * check if there is a gap immediately in front of us
 	 * @param levelScenes: the 2d array containing level information
 	 * @return: whether there is a gap immediately in front of us (true) or not (false)
 	 */
 	private boolean gapApproaching(byte[][] levelScenes) {
-		int fromX = receptiveFieldWidth / 2;
-	    int fromY = receptiveFieldHeight / 2;
 	    if (getReceptiveFieldCellValue(marioCenter[0] - 1, marioCenter[1] + 1) == 0) {
 	    	return true;
 	    }
@@ -152,16 +118,25 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	public boolean[] getAction() {
 		//NOTE: the levelData is y,x; NOT x,y (ie. block to the right of mario is (center[0],center[1]+1), not (center[0]+1,center[1])
 		
-		//if there is a wall in our way, jump as high as we can
-	    if (wallApproaching() && isMarioAbleToJump) {
+		//if there is a wall in our way, jump
+	    if ((isMarioAbleToJump) && (wallApproaching() || gapApproaching())) {
 	    	action[Mario.KEY_JUMP] = true;
 	    }
 	    if (action[Mario.KEY_JUMP]) {
+	    	//while jumping, monitor frames held; once 16 is passed, release to prepare for future jump
 		    if (++trueJumpCounter > 16) {
 		        trueJumpCounter = 0;
 		        action[Mario.KEY_JUMP] = false;
 		    }
 	    }
+	    //toggle jump off if we hit the ground before getting the full height out of our jump
+	    if (isMarioOnGround && trueJumpCounter > 1) {
+	    	trueJumpCounter = 0;
+	    	action[Mario.KEY_JUMP] = false;
+	    }
+	    
+	    //TODO: check shoot fireball
+	    //TODO: check slow down or shorten jump to avoid multiple small gaps
 		    
 	    action[Mario.KEY_RIGHT] = true;
 	    
