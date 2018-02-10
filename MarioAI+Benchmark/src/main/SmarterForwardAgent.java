@@ -65,32 +65,81 @@ private boolean DangerOfGap()
     return DangerOfGap(levelScene);
 }
 
+/**
+ * check if there is a gap immediately in front of us
+ * @param levelScenes: the 2d array containing level information
+ * @return: whether there is a gap immediately in front of us (true) or not (false)
+ */
+private boolean gapApproaching(byte[][] levelScenes) {
+	int fromX = receptiveFieldWidth / 2;
+    int fromY = receptiveFieldHeight / 2;
+    if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) == 0) {
+    	return true;
+    }
+    return false;
+}
+
+/**
+ * overloads gapApproaching to avoid requiring levelScene
+ * @return
+ */
+private boolean gapApproaching() {
+	return gapApproaching(levelScene);
+}
+
+/**
+ * check if there is a wall immediately in front of us
+ * @param levelScenes: the 2d array containing level information
+ * @return: whether there is a wall immediately in front of us (true) or not (false)
+ */
+private boolean wallApproaching(byte[][] levelScenes) {
+	if (getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1]) == 0) {
+		//System.out.println("wall approaching: true");
+    	return true;
+    }
+	System.out.println("wall approaching: false");
+	return false;
+}
+
+/**
+ * print the current state of the levelScene 2dArray
+ */
+private void printLevel() {
+	System.out.println("levelPrintStart");
+	//System.out.println("player pos: " + marioCenter[0] + ", " + marioCenter[1]);
+	for (int i = 0; i < levelScene.length; ++i) {
+		String lineStr  ="";
+		for (int r = 0; r < levelScene[i].length; ++r) {
+			lineStr += levelScene[i][r];
+		}
+		System.out.println(lineStr);
+	}
+	System.out.println("levelPrintEnd");
+}
+
+/**
+ * overloads wallApproaching to avoid requiring levelScene
+ * @return
+ */
+private boolean wallApproaching() {
+	return wallApproaching(levelScene);
+}
+
 public boolean[] getAction()
 {
     // this Agent requires observation integrated in advance.
 
-    if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 2) != 0 ||
-            getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) != 0 ||
-            DangerOfGap())
-    {
-        if (isMarioAbleToJump || (!isMarioOnGround && action[Mario.KEY_JUMP]))
-        {
-            action[Mario.KEY_JUMP] = true;
-        }
-        ++trueJumpCounter;
-    } else
-    {
-        action[Mario.KEY_JUMP] = false;
-        trueJumpCounter = 0;
+    if (gapApproaching() || wallApproaching()) {
+    	action[Mario.KEY_JUMP] = true;
     }
-
-    if (trueJumpCounter > 16)
-    {
-        trueJumpCounter = 0;
-        action[Mario.KEY_JUMP] = false;
+    else {
+    	action[Mario.KEY_JUMP] = false;
     }
-
-    action[Mario.KEY_SPEED] = DangerOfGap();
+    
+    action[Mario.KEY_JUMP] = !action[Mario.KEY_JUMP];
+    action[Mario.KEY_RIGHT] = true;
+    System.out.println(action);
+    //printLevel();
     return action;
 }
 }
