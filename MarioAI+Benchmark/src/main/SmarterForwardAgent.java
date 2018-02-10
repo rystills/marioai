@@ -123,10 +123,18 @@ private void printLevel() {
 private void printSurroundingsRow(int numTilesOut, int row) {
 	System.out.print('|');
 	for (int i = numTilesOut; i > 0; --i) {
-		System.out.print(getReceptiveFieldCellValue(marioCenter[0] - i, marioCenter[1] - row) + "|");
+		String curVal = Integer.toString(getReceptiveFieldCellValue(marioCenter[0] - i, marioCenter[1] - row));
+		if (curVal.length() < 3) {
+			curVal = ' ' + curVal + ' ';
+		}
+		System.out.print(curVal + "|");
 	}
 	for (int i = 0; i < numTilesOut+1; ++i) {
-		System.out.print(getReceptiveFieldCellValue(marioCenter[0] + i, marioCenter[1] - row) + "|");
+		String curVal = Integer.toString(getReceptiveFieldCellValue(marioCenter[0] + i, marioCenter[1] - row));
+		if (curVal.length() < 3) {
+			curVal = ' ' + curVal + ' ';
+		}
+		System.out.print(curVal + "|");
 	}
 	System.out.print('\n');	
 }
@@ -141,7 +149,7 @@ private void printSurroundings(int numTilesOut) {
 	}
 	System.out.print('\n');
 	for (int i = numTilesOut; i > 0; --i) {
-		printSurroundingsRow(numTilesOut, i);
+		printSurroundingsRow(numTilesOut, -i);
 	}
 	for (int i = 0; i < numTilesOut+1; ++i) {
 		printSurroundingsRow(numTilesOut, i);
@@ -166,7 +174,6 @@ public boolean[] getAction()
 	//if (gapApproaching() || wallApproaching()) {
     if (wallApproaching()) {
     	action[Mario.KEY_JUMP] = true;
-    	System.out.print("athgregaerga\n");
     }
     else {
     	action[Mario.KEY_JUMP] = false;
