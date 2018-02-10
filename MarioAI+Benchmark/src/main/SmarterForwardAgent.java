@@ -93,11 +93,9 @@ private boolean gapApproaching() {
  * @return: whether there is a wall immediately in front of us (true) or not (false)
  */
 private boolean wallApproaching(byte[][] levelScenes) {
-	if (getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1]) == 0) {
-		//System.out.println("wall approaching: true");
+	if (getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1]) != 0) {
     	return true;
     }
-	System.out.println("wall approaching: false");
 	return false;
 }
 
@@ -118,9 +116,46 @@ private void printLevel() {
 }
 
 /**
- * overloads wallApproaching to avoid requiring levelScene
- * @return
+ * print a single row from our surroundings
+ * @param numTilesOut: how many tiles away from mario we should display
+ * @param row: the relative row offset we wish to display
  */
+private void printSurroundingsRow(int numTilesOut, int row) {
+	System.out.print('|');
+	for (int i = numTilesOut; i > 0; --i) {
+		System.out.print(getReceptiveFieldCellValue(marioCenter[0] - i, marioCenter[1] - row) + "|");
+	}
+	for (int i = 0; i < numTilesOut+1; ++i) {
+		System.out.print(getReceptiveFieldCellValue(marioCenter[0] + i, marioCenter[1] - row) + "|");
+	}
+	System.out.print('\n');	
+}
+
+/**
+ * print our surrounds
+ * @param numTilesOut: how many tiles away from mario we should display
+ */
+private void printSurroundings(int numTilesOut) {
+	for (int i = 0; i < numTilesOut*5; ++i) {
+		System.out.print('-');
+	}
+	System.out.print('\n');
+	for (int i = numTilesOut; i > 0; --i) {
+		printSurroundingsRow(numTilesOut, i);
+	}
+	for (int i = 0; i < numTilesOut+1; ++i) {
+		printSurroundingsRow(numTilesOut, i);
+	}
+	for (int i = 0; i < numTilesOut*5; ++i) {
+		System.out.print('-');
+	}
+	System.out.print('\n');
+}
+
+private void printSurroundings() {
+	printSurroundings(2);
+}
+
 private boolean wallApproaching() {
 	return wallApproaching(levelScene);
 }
@@ -128,18 +163,21 @@ private boolean wallApproaching() {
 public boolean[] getAction()
 {
     // this Agent requires observation integrated in advance.
-
-    if (gapApproaching() || wallApproaching()) {
+	//if (gapApproaching() || wallApproaching()) {
+    if (wallApproaching()) {
     	action[Mario.KEY_JUMP] = true;
+    	System.out.print("athgregaerga\n");
     }
     else {
     	action[Mario.KEY_JUMP] = false;
     }
     
-    action[Mario.KEY_JUMP] = !action[Mario.KEY_JUMP];
+    //action[Mario.KEY_JUMP] = !action[Mario.KEY_JUMP];
     action[Mario.KEY_RIGHT] = true;
-    System.out.println(action);
+    //System.out.println(action);
     //printLevel();
+    
+    printSurroundings();
     return action;
 }
 }
