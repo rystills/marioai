@@ -133,12 +133,13 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	}
 	
 	/**
-	 * check if there is a wall immediately in front of us
+	 * check if there is a wall 1 or 2 blocks in front of us
 	 * @param levelScenes: the 2d array containing level information
 	 * @return: whether there is a wall immediately in front of us (true) or not (false)
 	 */
 	private boolean wallApproaching(byte[][] levelScenes) {
-		if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) != 0) {
+		if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) != 0 || 
+				getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 2) != 0) {
 	    	return true;
 	    }
 		return false;
@@ -152,23 +153,19 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 		//NOTE: the levelData is y,x; NOT x,y (ie. block to the right of mario is (center[0],center[1]+1), not (center[0]+1,center[1])
 		
 		//if there is a wall in our way, jump as high as we can
-	    if (wallApproaching()) {
+	    if (wallApproaching() && isMarioAbleToJump) {
 	    	action[Mario.KEY_JUMP] = true;
-	    	++trueJumpCounter;
 	    }
-	    else {
-	    	action[Mario.KEY_JUMP] = false;
-	    	trueJumpCounter = 0;
+	    if (action[Mario.KEY_JUMP]) {
+		    if (++trueJumpCounter > 16) {
+		        trueJumpCounter = 0;
+		        action[Mario.KEY_JUMP] = false;
+		    }
 	    }
-	    if (trueJumpCounter > 16) {
-	        trueJumpCounter = 0;
-	        action[Mario.KEY_JUMP] = false;
-	    }
-	    
-	    //action[Mario.KEY_JUMP] = !action[Mario.KEY_JUMP];
+		    
 	    action[Mario.KEY_RIGHT] = true;
-	    //System.out.println(action);
-	    //printLevel();
+	    
+	    System.out.println("jump counter: " + trueJumpCounter);
 	    
 	    printSurroundings();
 	    return action;
