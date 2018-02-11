@@ -113,7 +113,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 		for (int i = 0; i < enemiesFloatPos.length; i+=3) {
 			float ex = enemiesFloatPos[i+1];
 			//check if any enemies x vales are within a small area around mario
-			if (ex <= 40 && ex >= -16) {
+			if (ex <= 48 && ex >= -16) {
 				return true;
 			}
 		}
@@ -146,7 +146,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 			action[Mario.KEY_SPEED] = true;
 			return false;
 		}
-		//if an enemy is approaching, toggle run key to shoot a fireball asap
+		//if an enemy is approaching and we are falling, toggle run key to shoot a fireball asap
 		if (eAppro) {
 			action[Mario.KEY_SPEED] = !action[Mario.KEY_SPEED];
 			return true;
