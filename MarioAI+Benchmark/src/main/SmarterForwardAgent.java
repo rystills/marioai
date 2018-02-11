@@ -91,7 +91,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	
 	/**
 	 * check if there is a wall 1 or 2 blocks in front of us
-	 * @return: whether there is a wall immediately in front of us (true) or not (false)
+	 * @return: whether there is a wall in front of us (true) or not (false)
 	 */
 	private boolean wallApproaching() {
 		if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) != 0 || 
@@ -102,10 +102,31 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	}
 	
 	/**
+	 * check if there is an enemy 1 or 2 blocks in front of us
+	 * @return: whether there is an enemy in front of us (true) or not (false)
+	 */
+	private boolean enemyApproaching() {
+//		System.out.println("mario x: " + marioFloatPos[0] + ", mario y: " + marioFloatPos[1]);
+//		for (int i = 0; i < enemiesFloatPos.length; i+=3) {
+//			System.out.println("x: " + enemiesFloatPos[i+1] + ", y: " + enemiesFloatPos[i+2]);
+//		}
+		for (int i = 0; i < enemiesFloatPos.length; i+=3) {
+			float ex = enemiesFloatPos[i+1];
+			//check if any enemies x vales are within a small area around mario
+			if (ex <= 40 && ex >= -16) {
+				System.out.println("enemy approaching; jumping");
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * check whether or not we can currently shoot a fireball
 	 */
 	private boolean checkShootFireball() {
-		//System.out.println("can mario shoot?: " + isMarioAbleToShoot);
+		//TODO: isMarioAbleToShoot only returns true when KEY_SPEED is not down, making it useless
+		//LevelScene.fireballsOnScreen is what we need, but no way to access it without modifying source
 		if (isMarioAbleToShoot) {
 			action[Mario.KEY_SPEED] = !action[Mario.KEY_SPEED];
 			return true;
@@ -117,7 +138,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 		//NOTE: the levelData is y,x; NOT x,y (ie. block to the right of mario is (center[0],center[1]+1), not (center[0]+1,center[1])
 		
 		//if there is a wall in our way, jump
-	    if ((isMarioAbleToJump) && (wallApproaching() || gapApproaching())) {
+	    if ((isMarioAbleToJump) && (wallApproaching() || gapApproaching() || enemyApproaching())) {
 	    	action[Mario.KEY_JUMP] = true;
 	    }
 	    if (action[Mario.KEY_JUMP]) {
@@ -142,7 +163,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	    //System.out.println("jump counter: " + trueJumpCounter);
 	    
 	    //printSurroundings();
-	    System.out.println("gap approaching: " + gapApproaching());
+	    //System.out.println("gap approaching: " + gapApproaching());
 	    return action;
 	}
 }
