@@ -18,6 +18,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	boolean wAppro = false;
 	boolean gAppro = false;
 	boolean eAppro = false;
+	float prevY = 0;
 	
 	public SmarterForwardAgent() {
 	    super("ForwardAgent");
@@ -120,7 +121,22 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	}
 	
 	/**
+	 * check if we moved down since last frame; if so, force trueJumpCounter to 0 and stop holding jump
+	 * @return: whether or not we moved down since last frame and had trueJumpCounter > 1
+	 */
+	private boolean checkMovedDown() {
+		//ignore trueJumpCounter <=1 so we can still wallkick (as during wallslide we are slowly moving down)
+		if (marioFloatPos[1] > prevY && trueJumpCounter > 1) {
+			trueJumpCounter = 0;
+	    	action[Mario.KEY_JUMP] = false;
+	    	return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * check whether or not we can currently shoot a fireball
+	 * @return: whether or not we just toggled KEY_SPEED (note that this does not mean we shot a fireball just yet)
 	 */
 	private boolean checkShootFireball() {
 		//TODO: isMarioAbleToShoot only returns true when KEY_SPEED is not down, so we have to do some guesswork
@@ -133,7 +149,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 		//if an enemy is approaching, toggle run key to shoot a fireball asap
 		if (eAppro) {
 			action[Mario.KEY_SPEED] = !action[Mario.KEY_SPEED];
-			return action[Mario.KEY_SPEED] == true;
+			return true;
 		}
 		action[Mario.KEY_SPEED] = true;
 		return false;
@@ -141,6 +157,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	
 	public boolean[] getAction() {
 		//NOTE: the levelData is y,x; NOT x,y (ie. block to the right of mario is (center[0],center[1]+1), not (center[0]+1,center[1])
+		//NOTE: moving from top of screen to bottom of screen INCREASES y, meaning (0,0) = topleft (we are operating in quadrant 4)
 		
 		//if there is a wall in our way, jump
 		wAppro = wallApproaching(); 
@@ -163,10 +180,14 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	    	action[Mario.KEY_JUMP] = false;
 	    }
 	    
+	    checkMovedDown();
+	    
 	    checkShootFireball();
 	    
 	    action[Mario.KEY_RIGHT] = true;
 	    printSurroundings();
+	    
+	    prevY = marioFloatPos[1];
 	    return action;
 	}
 }
