@@ -80,30 +80,20 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	
 	/**
 	 * check if there is a gap immediately in front of us
-	 * @param levelScenes: the 2d array containing level information
 	 * @return: whether there is a gap immediately in front of us (true) or not (false)
 	 */
-	private boolean gapApproaching(byte[][] levelScenes) {
-	    if (getReceptiveFieldCellValue(marioCenter[0] - 1, marioCenter[1] + 1) == 0) {
+	private boolean gapApproaching() {
+	    if (getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1] + 1) == 0) {
 	    	return true;
 	    }
 	    return false;
 	}
 	
 	/**
-	 * overloads gapApproaching to avoid requiring levelScene
-	 * @return
-	 */
-	private boolean gapApproaching() {
-		return gapApproaching(levelScene);
-	}
-	
-	/**
 	 * check if there is a wall 1 or 2 blocks in front of us
-	 * @param levelScenes: the 2d array containing level information
 	 * @return: whether there is a wall immediately in front of us (true) or not (false)
 	 */
-	private boolean wallApproaching(byte[][] levelScenes) {
+	private boolean wallApproaching() {
 		if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) != 0 || 
 				getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 2) != 0) {
 	    	return true;
@@ -111,8 +101,16 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 		return false;
 	}
 	
-	private boolean wallApproaching() {
-		return wallApproaching(levelScene);
+	/**
+	 * check whether or not we can currently shoot a fireball
+	 */
+	private boolean checkShootFireball() {
+		//System.out.println("can mario shoot?: " + isMarioAbleToShoot);
+		if (isMarioAbleToShoot) {
+			action[Mario.KEY_SPEED] = !action[Mario.KEY_SPEED];
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean[] getAction() {
@@ -135,14 +133,16 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	    	action[Mario.KEY_JUMP] = false;
 	    }
 	    
-	    //TODO: check shoot fireball
-	    //TODO: check slow down or shorten jump to avoid multiple small gaps
+	    checkShootFireball();
+	    
+	    //TODO: check slow down or shorten jump to avoid multiple small gaps (tryLandEarly)
 		    
 	    action[Mario.KEY_RIGHT] = true;
 	    
-	    System.out.println("jump counter: " + trueJumpCounter);
+	    //System.out.println("jump counter: " + trueJumpCounter);
 	    
-	    printSurroundings();
+	    //printSurroundings();
+	    System.out.println("gap approaching: " + gapApproaching());
 	    return action;
 	}
 }
