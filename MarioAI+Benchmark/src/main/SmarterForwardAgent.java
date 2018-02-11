@@ -15,6 +15,9 @@ import ch.idsia.benchmark.mario.environments.Environment;
 public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	int trueJumpCounter = 0;
 	int trueSpeedCounter = 0;
+	boolean wAppro = false;
+	boolean gAppro = false;
+	boolean eAppro = false;
 	
 	public SmarterForwardAgent() {
 	    super("ForwardAgent");
@@ -127,10 +130,15 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	private boolean checkShootFireball() {
 		//TODO: isMarioAbleToShoot only returns true when KEY_SPEED is not down, making it useless
 		//LevelScene.fireballsOnScreen is what we need, but no way to access it without modifying source
-		if (isMarioAbleToShoot) {
+//		if (isMarioAbleToShoot) {
+//			action[Mario.KEY_SPEED] = !action[Mario.KEY_SPEED];
+//			return true;
+//		}
+		if (eAppro) {
 			action[Mario.KEY_SPEED] = !action[Mario.KEY_SPEED];
-			return true;
+			return action[Mario.KEY_SPEED] == true;
 		}
+		action[Mario.KEY_SPEED] = true;
 		return false;
 	}
 	
@@ -138,7 +146,11 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 		//NOTE: the levelData is y,x; NOT x,y (ie. block to the right of mario is (center[0],center[1]+1), not (center[0]+1,center[1])
 		
 		//if there is a wall in our way, jump
-	    if ((isMarioAbleToJump) && (wallApproaching() || gapApproaching() || enemyApproaching())) {
+		wAppro = wallApproaching(); 
+		eAppro = enemyApproaching();
+		gAppro = gapApproaching();
+		
+	    if ((isMarioAbleToJump) && (wAppro || eAppro || gAppro)) {
 	    	action[Mario.KEY_JUMP] = true;
 	    }
 	    if (action[Mario.KEY_JUMP]) {
@@ -156,8 +168,10 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	    
 	    checkShootFireball();
 	    
+	    //TODO: check ledges we can jump to in order to prioritize gaining height
 	    //TODO: check slow down or shorten jump to avoid multiple small gaps (tryLandEarly)
-		    
+		//TODO: check slow down to avoid incoming enemies while airborne    
+	    
 	    action[Mario.KEY_RIGHT] = true;
 	    
 	    //System.out.println("jump counter: " + trueJumpCounter);
