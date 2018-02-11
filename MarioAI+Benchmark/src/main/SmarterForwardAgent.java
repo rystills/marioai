@@ -155,6 +155,26 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 		return false;
 	}
 	
+	/**
+	 * check if we are about to stomp on an enemy; if so, hold jump
+	 * @return: whether we are about to stomp on an enemy (true) or not (false)
+	 */
+	private boolean checkAboutToStomp() {
+		//can't stomp an enemy while grouhnded
+		if (isMarioOnGround) {
+			return false;
+		}
+		//check if any enemies are within a tight bound of our x position (note that we ignore y position for simplicity)
+		for (int i = 0; i < enemiesFloatPos.length; i+=3) {
+			if (enemiesFloatPos[i+1] <= 16 && enemiesFloatPos[i+1] >= -8) {
+				action[Mario.KEY_JUMP] = true;
+		    	trueJumpCounter = 1;
+		    	return true;
+			}
+		}
+    	return false;
+	}
+	
 	public boolean[] getAction() {
 		//NOTE: the levelData is y,x; NOT x,y (ie. block to the right of mario is (center[0],center[1]+1), not (center[0]+1,center[1])
 		//NOTE: moving from top of screen to bottom of screen INCREASES y, meaning (0,0) = topleft (we are operating in quadrant 4)
@@ -180,9 +200,14 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	    	action[Mario.KEY_JUMP] = false;
 	    }
 	    
+	    
 	    checkMovedDown();
 	    
 	    checkShootFireball();
+	    
+
+	    //hold jump if we are about to stomp an enemy
+	   checkAboutToStomp();
 	    
 	    action[Mario.KEY_RIGHT] = true;
 	    printSurroundings();
