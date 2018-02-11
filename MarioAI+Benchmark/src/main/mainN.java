@@ -2,8 +2,8 @@ package main;
 
 import ch.idsia.agents.Agent;
 import ch.idsia.agents.controllers.ForwardAgent;
-import main.SmarterForwardAgent;
 import ch.idsia.agents.controllers.ForwardJumpingAgent;
+import ch.idsia.agents.controllers.SmarterForwardAgent;
 import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 import ch.idsia.benchmark.tasks.BasicTask;
@@ -18,9 +18,11 @@ public final class mainN
 {
 public static void main(String[] args)
 {
-        //final String argsString = "-vis on -ld 25 -ag ch.idsia.agents.controllers.ScaredShooty";
-			final String argsString = "-vis on -ld 0 -ls 1 -ag main.SmarterForwardAgent";
-			//final String argsString = "-vis on -ld 5 -ls 0 -ag ch.idsia.agents.controllers.ForwardAgent";    
+		//change the value after -ld to specify difficulty, change the value after -ls to specify seed
+		final String argsString = "-vis on -ld 0 -ls 0 -ag ch.idsia.agents.controllers.SmarterForwardAgent";
+	
+		//final String argsString = "-vis on -ld 25 -ag ch.idsia.agents.controllers.ScaredShooty";
+		//final String argsString = "-vis on -ld 5 -ls 0 -ag ch.idsia.agents.controllers.ForwardAgent";    
 	final CmdLineOptions cmdLineOptions = new CmdLineOptions(argsString);
 //        final Environment environment = new MarioEnvironment();
  //       final Agent agent = new ForwardJumpingAgent();

@@ -1,18 +1,11 @@
-package main;
+package ch.idsia.agents.controllers;
 
 import ch.idsia.agents.Agent;
-import ch.idsia.agents.controllers.BasicMarioAIAgent;
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment; 
 
-/**
- * Created by IntelliJ IDEA.
- * User: Sergey Karakovskiy, sergey.karakovskiy@gmail.com
- * Date: Apr 8, 2009
- * Time: 4:03:46 AM
- */
-
 public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
+	//persistent variables for stateful logic
 	int trueJumpCounter = 0;
 	int trueSpeedCounter = 0;
 	boolean wAppro = false;
@@ -146,7 +139,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 			action[Mario.KEY_SPEED] = true;
 			return false;
 		}
-		//if an enemy is approaching and we are falling, toggle run key to shoot a fireball asap
+		//if an enemy is approaching toggle run key to shoot a fireball asap
 		if (eAppro) {
 			action[Mario.KEY_SPEED] = !action[Mario.KEY_SPEED];
 			return true;
@@ -178,7 +171,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	public boolean[] getAction() {
 		//NOTE: the levelData is y,x; NOT x,y (ie. block to the right of mario is (center[0],center[1]+1), not (center[0]+1,center[1])
 		//NOTE: moving from top of screen to bottom of screen INCREASES y, meaning (0,0) = topleft (we are operating in quadrant 4)
-		
+	    printSurroundings();
 		//if there is a wall in our way, jump
 		wAppro = wallApproaching(); 
 		eAppro = enemyApproaching();
@@ -194,25 +187,26 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 		        action[Mario.KEY_JUMP] = false;
 		    }
 	    }
+	    
 	    //toggle jump off if we hit the ground before getting the full height out of our jump
 	    if (isMarioOnGround && trueJumpCounter > 1) {
 	    	trueJumpCounter = 0;
 	    	action[Mario.KEY_JUMP] = false;
 	    }
 	    
-	    
+	    //toggle jump off if we are falling
 	    checkMovedDown();
 	    
+	    //shoot a fireball if an enemy is near
 	    checkShootFireball();
-	    
 
 	    //hold jump if we are about to stomp an enemy
 	   checkAboutToStomp();
 	    
-	    action[Mario.KEY_RIGHT] = true;
-	    printSurroundings();
-	    
+	   //update persistent variables
 	    prevY = marioFloatPos[1];
+	    
+	    //return final results
 	    return action;
 	}
 }
