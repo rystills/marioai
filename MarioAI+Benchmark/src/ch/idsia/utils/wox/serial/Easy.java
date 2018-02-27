@@ -40,7 +40,7 @@ public class Easy
         try
         {
             SAXBuilder builder = new SAXBuilder();
-            InputStream is = new FileInputStream(filename);
+            InputStream is = new FileInputStream("C:\\Users\\Ryan\\Documents\\git-projects\\marioai\\MarioAI+Benchmark\\" + filename);
             Document doc = builder.build(is);
             Element el = doc.getRootElement();
             ObjectReader reader = new SimpleReader();
