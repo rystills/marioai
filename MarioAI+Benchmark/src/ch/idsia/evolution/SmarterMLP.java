@@ -2,23 +2,14 @@ package ch.idsia.evolution;
 
 import java.util.Random;
 
-/**
- * Created by IntelliJ IDEA.
- * User: julian
- * Date: Apr 28, 2009
- * Time: 2:15:10 PM
- */
-public class SmarterMLP implements FA<double[], double[]>, Evolvable
-{
+public class SmarterMLP implements FA<double[], double[]>, Evolvable {
 
     private double[][] firstConnectionLayer;
     private double[][] secondConnectionLayer;
     private double[] hiddenNeurons;
     private double[] outputs;
     private double[] inputs;
-    //private double[] targetOutputs;
     public double mutationMagnitude = 0.1;
-
 
     public static double mean = 0.0f;        // initialization mean
     public static double deviation = 0.1f;   // initialization deviation
@@ -121,11 +112,7 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable
 
         double phi1 = phi * random.nextDouble();
         double phi2 = phi * random.nextDouble();
-        //System.out.println("phi1: "+phi1+" phi2: "+phi2);
-        //System.out.println(" LAST:" + last);
-        //System.out.println(" PBEST:" + pBest);
-        //System.out.println(" GBEST:" + gBest);
-        //System.out.println(" THIS:" + toString());
+        
         for (int i = 0; i < inputs.length; i++)
         {
             for (int j = 0; j < hiddenNeurons.length; j++)
@@ -202,10 +189,7 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable
 
         for (int i = 0; i < outputs.length; i++)
         {
-            //System.out.println("Node : " + i);
             outputError[i] = dtanh(outputs[i]) * (targetOutputs[i] - outputs[i]);
-            //System.out.println("Err: " + (targetOutputs[i] - outputs[i]) +  "=" + targetOutputs[i] +  "-" + outputs[i]);
-            //System.out.println("dnet: " +  outputError[i] +  "=" + (dtanh(outputs[i])) +  "*" + (targetOutputs[i] - outputs[i]));
 
             if (Double.isNaN(outputError[i]))
             {
@@ -221,15 +205,11 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable
         for (int hidden = 0; hidden < hiddenNeurons.length; hidden++)
         {
             double contributionToOutputError = 0;
-            // System.out.println("Hidden: " + hidden);
             for (int toOutput = 0; toOutput < outputs.length; toOutput++)
             {
-                // System.out.println("Hidden " + hidden + ", toOutput" + toOutput);
                 contributionToOutputError += secondConnectionLayer[hidden][toOutput] * outputError[toOutput];
-                // System.out.println("Err tempSum: " + contributionToOutputError +  "=" +secondConnectionLayer[hidden][toOutput]  +  "*" +outputError[toOutput] );
             }
             hiddenError[hidden] = dtanh(hiddenNeurons[hidden]) * contributionToOutputError;
-            //System.out.println("dnet: " + hiddenError[hidden] +  "=" +  dtanh(hiddenNeurons[hidden])+  "*" + contributionToOutputError);
         }
 
         ////////////////////////////////////////////////////////////////////////////
@@ -281,34 +261,19 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable
         return summedOutputError;
     }
 
-
-    private double sig(double val)
-    {
-        return 1.0d / (1.0d + Math.exp(-val));
-    }
-
     private void tanh(double[] array)
     {
         for (int i = 0; i < array.length; i++)
         {
             array[i] = Math.tanh(array[i]);
-            // for the sigmoid
-            // array[i] = array[i];
-            //array[i] = sig(array[i]);//array[i];//
         }
     }
 
-    private double dtanh(double num)
-    {
-        //return 1;
+    private double dtanh(double num) {
         return (1 - (num * num));
-        // for the sigmoid
-        //final double val = sig(num);
-        //return (val*(1-val));
     }
 
-    private double sum()
-    {
+    private double sum() {
         double sum = 0;
         for (double[] aFirstConnectionLayer : firstConnectionLayer)
         {
@@ -327,73 +292,32 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable
         return sum;
     }
 
-    public double getMutationMagnitude()
-    {
+    public double getMutationMagnitude() {
         return mutationMagnitude;
     }
 
-    public void setMutationMagnitude(double mutationMagnitude)
-    {
+    public void setMutationMagnitude(double mutationMagnitude) {
         this.mutationMagnitude = mutationMagnitude;
     }
 
-    public static void setInitParameters(double mean, double deviation)
-    {
+    public static void setInitParameters(double mean, double deviation) {
         System.out.println("PARAMETERS SET: " + mean + "  deviation: " + deviation);
 
         SmarterMLP.mean = mean;
         SmarterMLP.deviation = deviation;
     }
 
-    public void println()
-    {
-        System.out.print("\n\n----------------------------------------------------" +
-                "-----------------------------------\n");
-        for (double[] aFirstConnectionLayer : firstConnectionLayer)
-        {
-            System.out.print("|");
-            for (double anAFirstConnectionLayer : aFirstConnectionLayer)
-            {
-                System.out.print(" " + anAFirstConnectionLayer);
-            }
-            System.out.print(" |\n");
-        }
-        System.out.print("----------------------------------------------------" +
-                "-----------------------------------\n");
-        for (double[] aSecondConnectionLayer : secondConnectionLayer)
-        {
-            System.out.print("|");
-            for (double anASecondConnectionLayer : aSecondConnectionLayer)
-            {
-                System.out.print(" " + anASecondConnectionLayer);
-            }
-            System.out.print(" |\n");
-        }
-        System.out.print("----------------------------------------------------" +
-                "-----------------------------------\n");
-    }
-
-    public String toString()
-    {
-        int numberOfConnections = (firstConnectionLayer.length * firstConnectionLayer[0].length) +
-                (secondConnectionLayer.length * secondConnectionLayer[0].length);
-        return "Straight mlp, mean connection weight " + (sum() / numberOfConnections);
-    }
-
-    public void setLearningRate(double learningRate)
-    {
+    public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
     }
 
-    public double[] getOutputs()
-    {
+    public double[] getOutputs() {
         double[] outputsCopy = new double[outputs.length];
         System.arraycopy(outputs, 0, outputsCopy, 0, outputs.length);
         return outputsCopy;
     }
 
-    public double[] getWeightsArray()
-    {
+    public double[] getWeightsArray() {
         double[] weights = new double[inputs.length * hiddenNeurons.length + hiddenNeurons.length * outputs.length];
 
         int k = 0;
@@ -438,19 +362,12 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable
         }
     }
 
-    public int getNumberOfInputs()
-    {
-        return inputs.length;
+    public void randomize() {
+    	randomize(firstConnectionLayer);
+    	randomize(secondConnectionLayer);
     }
 
-    public void randomise()
-    {
-        randomise(firstConnectionLayer);
-        randomise(secondConnectionLayer);
-    }
-
-    protected void randomise(double[][] layer)
-    {
+    protected void randomize(double[][] layer) 	{
         for (int i = 0; i < layer.length; i++)
         {
             for (int j = 0; j < layer[i].length; j++)
@@ -459,15 +376,4 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable
             }
         }
     }
-
-    public double[] getArray()
-    {
-        return getWeightsArray();
-    }
-
-    public void setArray(double[] array)
-    {
-        setWeightsArray(array);
-    }
-
 }

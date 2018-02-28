@@ -9,19 +9,11 @@ import ch.idsia.scenarios.oldscenarios.Stats;
 import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.utils.wox.serial.Easy;
 
-/**
- * Created by IntelliJ IDEA.
- * User: julian
- * Date: Jun 14, 2009
- * Time: 2:15:51 PM
- */
-public class mainEvolveScalingMutation
-{
+public class mainEvolveScalingMutation {
     final static int generations = 30;
     final static int populationSize = 50;
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         CmdLineOptions options = new CmdLineOptions(new String[0]);
         options.setPauseWorld(false);
         Evolvable initial = new SmarterMLPAgent();
@@ -36,8 +28,7 @@ public class mainEvolveScalingMutation
         final String fileName = "evolved" + (int) (Math.random() * Integer.MAX_VALUE) + ".xml";
         
         float mutationMagnitude = .3f;
-        for (int gen = 0; gen < generations; gen++)
-        {
+        for (int gen = 0; gen < generations; gen++) {
         	if (gen == generations-1) {
         		options.setVisualization(true);
         	}
