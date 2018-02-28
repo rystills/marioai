@@ -1,37 +1,26 @@
 package ch.idsia.agents.learning;
 
 import ch.idsia.agents.Agent;
-import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.evolution.Evolvable;
 import ch.idsia.evolution.SmarterMLP;
 
-/**
- * Created by IntelliJ IDEA.
- * User: julian
- * Date: Apr 28, 2009
- * Time: 2:09:42 PM
- */
-public class SmarterMLPAgent implements Agent, Evolvable
-{
+public class SmarterMLPAgent implements Agent, Evolvable {
 
     public SmarterMLP mlp;
-    private String name = "SimpleMLPAgent";
+    private String name = "SmarterMLPAgent";
+    //number of input nodes can be toggled; output nodes should remain at 6 (6 potential actions)
     final int numberOfOutputs = 6;
     final int numberOfInputs = 10;
+    
+    //standard integrated data
     private Environment environment;
-
-    /*final*/
     protected byte[][] levelScene;
-    /*final */
     protected byte[][] enemies;
     protected byte[][] mergedObservation;
-
     protected float[] marioFloatPos = null;
     protected float[] enemiesFloatPos = null;
-
     protected int[] marioState = null;
-
     protected int marioStatus;
     protected int marioMode;
     protected boolean isMarioOnGround;
@@ -43,39 +32,45 @@ public class SmarterMLPAgent implements Agent, Evolvable
     protected int getKillsByStomp;
     protected int getKillsByShell;
 
-    // values of these variables could be changed during the Agent-Environment interaction.
-    // Use them to get more detailed or less detailed description of the level.
-    // for information see documentation for the benchmark <link: marioai.org/marioaibenchmark/zLevels
+    //adjust for varying environment information granularity (see: marioai.org/marioaibenchmark/zLevels)
     int zLevelScene = 1;
     int zLevelEnemies = 0;
 
-	//persistent variables for stateful logic
-    float prevX = 0;
-    float prevY = 0;
-    protected int[] marioCenter;
+	//non-standard persistent variables for integrated stateful logic
+    float prevX = 0; //x value last frame
+    float prevY = 0; //y value last frame
+    protected int[] marioCenter; //receptive field center
 
-    public SmarterMLPAgent()
-    {
-        mlp = new SmarterMLP(numberOfInputs, 10, numberOfOutputs);
-    }
-
-    private SmarterMLPAgent(SmarterMLP mlp)
-    {
+    /**
+     * construct a new SmarterMLPAgent with the specified underlying MLP
+     * @param mlp: the mlp to use internally for this agent
+     */
+    private SmarterMLPAgent(SmarterMLP mlp) {
         this.mlp = mlp;
     }
-
-    public Evolvable getNewInstance()
-    {
-        return new SmarterMLPAgent(mlp.getNewInstance());
+    
+    /**
+     * construct a new SmarterMLPAgent with the default mlp configuration (10 inputs, hidden layer nodes, and outputs)
+     */
+    public SmarterMLPAgent() {
+        mlp = new SmarterMLP(numberOfInputs, 10, numberOfOutputs);
     }
+    
+    //satisfy Agent implementation
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public void giveIntermediateReward(float intermediateReward){ }
+    public void reset() { mlp.reset(); }
 
-    public Evolvable copy()
-    {
-        return new SmarterMLPAgent(mlp.copy());
-    }
+    //satisfy Evolvable implementation
+    public Evolvable getNewInstance() { return new SmarterMLPAgent(mlp.getNewInstance()); }
+    public Evolvable copy() { return new SmarterMLPAgent(mlp.copy()); }
 
-    public void integrateObservation(Environment environment)
-    {
+    /**
+     * integrate basic stateful data from the specified environment instance
+     * @param environment: the currently running environment instance from which we wish to integrate state information
+     */
+    public void integrateObservation(Environment environment) {
         this.environment = environment;
         levelScene = environment.getLevelSceneObservationZ(zLevelScene);
         enemies = environment.getEnemiesObservationZ(zLevelEnemies);
@@ -85,8 +80,7 @@ public class SmarterMLPAgent implements Agent, Evolvable
         this.enemiesFloatPos = environment.getEnemiesFloatPos();
         this.marioState = environment.getMarioState();
 
-        // It also possible to use direct methods from Environment interface.
-        //
+        //many of these go unused, but are left in for convenient potential future use
         marioStatus = marioState[0];
         marioMode = marioState[1];
         isMarioOnGround = marioState[2] == 1;
@@ -99,17 +93,15 @@ public class SmarterMLPAgent implements Agent, Evolvable
         getKillsByShell = marioState[9];
     }
 
-    public void giveIntermediateReward(float intermediateReward)
-    {
-
-    }
-
-    public void reset()
-    { mlp.reset(); }
-
-    public void mutate()
-    { mlp.mutate(); }
+    /**
+     * mutate the hidden layer of our NN using the last set mutation magnitude
+     */
+    public void mutate() { mlp.mutate(); }
     
+    /**
+     * set the mutation magnitude and mutate the hidden layer of our NN
+     * @param mutationMagnitude: the magnitude to apply to our mutation
+     */
     public void mutate(float mutationMagnitude) {
     	mlp.mutate(mutationMagnitude);
     }
@@ -196,68 +188,52 @@ public class SmarterMLPAgent implements Agent, Evolvable
 		return Math.abs(marioFloatPos[0] - prevX) >= 8; 
 	}
     
-	public int getReceptiveFieldCellValue(int x, int y)
-	{
+	/**
+	 * get the receptive field value at the specified coordinates
+	 * @param x: the x coordinate in the field
+	 * @param y: the y coordinate in the field
+	 * @return the receptive field value at the specified coordinates
+	 */
+	public int getReceptiveFieldCellValue(int x, int y) {
 	    if (x < 0 || x >= levelScene.length || y < 0 || y >= levelScene[0].length)
 	        return 0;
 
 	    return levelScene[x][y];
 	}
 	
-    public boolean[] getAction()
-    {
-//        double[] inputs = new double[]{probe(-1, -1, levelScene), probe(0, -1, levelScene), probe(1, -1, levelScene),
-//                              probe(-1, 0, levelScene), probe(0, 0, levelScene), probe(1, 0, levelScene),
-//                                probe(-1, 1, levelScene), probe(0, 1, levelScene), probe(1, 1, levelScene),
-//                                1};
-       
-    	/*double[] inputs = new double[]{probe(-1, -1, mergedObservation), probe(0, -1, mergedObservation), probe(1, -1, mergedObservation),
-                probe(-1, 0, mergedObservation), probe(0, 0, mergedObservation), probe(1, 0, mergedObservation),
-                probe(-1, 1, mergedObservation), probe(0, 1, mergedObservation), probe(1, 1, mergedObservation),
-                1};*/
-    	
+	/**
+	 * check our inputs, propagate them, and return some output
+	 * @return the array of keypresses comprising the action our agent wishes to perform
+	 */
+    public boolean[] getAction() {
+    	//update immediate non-standard persistent data
     	marioCenter = environment.getMarioReceptiveFieldCenter();
     	
+    	//construct our input layer from each of our input conditions
     	double[] inputs = new double[] {
-    			gapApproaching() ? 1 : 0,
-    	    	wallApproaching() ? 1 : 0,
-    			enemyApproaching() ? 1 : 0,
-    			checkAboutToStomp() ? 1 : 0,
-    			checkMovedDown() ? 1 : 0,
-    			marioMode == 2 ? 1 : 0,
-    			marioMode == 0 ? 1 : 0,
-    			isMarioOnGround ? 1 : 0,
-    			isMarioAbleToJump ? 1 : 0,
-    			isMarioRunning() ? 0 : 1
-    			
+			gapApproaching() ? 1 : 0,
+	    	wallApproaching() ? 1 : 0,
+			enemyApproaching() ? 1 : 0,
+			checkAboutToStomp() ? 1 : 0,
+			checkMovedDown() ? 1 : 0,
+			marioMode == 2 ? 1 : 0,
+			marioMode == 0 ? 1 : 0,
+			isMarioOnGround ? 1 : 0,
+			isMarioAbleToJump ? 1 : 0,
+			isMarioRunning() ? 0 : 1
     	};
+    	
+    	//construct our output layer by propagating our hidden layer from our inputs
         double[] outputs = mlp.propagate(inputs);
-        boolean[] action = new boolean[numberOfOutputs];
-        for (int i = 0; i < action.length; i++) {
-            action[i] = outputs[i] > 0;
-        }
         
-        //update persistent variables
+        //clamp outputs to 0/1 to map to keypresses
+        boolean[] action = new boolean[numberOfOutputs];
+        for (int i = 0; i < action.length; action[i] = outputs[i] > 0, ++i);
+        
+        //update late non-standard persistent data
 	    prevY = marioFloatPos[1];
 	    prevX = marioFloatPos[0];
 	    
         return action;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    private double probe(int x, int y, byte[][] scene)
-    {
-        int realX = x + 11;
-        int realY = y + 11;
-        return (scene[realX][realY] != 0) ? 1 : 0;
     }
 }
