@@ -174,95 +174,13 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
             }
         }
     }
-
-    public double backPropagate(double[] targetOutputs)
-    {
-        // Calculate output error
-        double[] outputError = new double[outputs.length];
-
-        for (int i = 0; i < outputs.length; i++)
-        {
-            outputError[i] = dtanh(outputs[i]) * (targetOutputs[i] - outputs[i]);
-
-            if (Double.isNaN(outputError[i]))
-            {
-                System.out.println("Problem at output " + i);
-                System.out.println(outputs[i] + " " + targetOutputs[i]);
-                System.exit(0);
-            }
-        }
-
-        // Calculate hidden layer error
-        double[] hiddenError = new double[hiddenNeurons.length];
-
-        for (int hidden = 0; hidden < hiddenNeurons.length; hidden++)
-        {
-            double contributionToOutputError = 0;
-            for (int toOutput = 0; toOutput < outputs.length; toOutput++)
-            {
-                contributionToOutputError += secondConnectionLayer[hidden][toOutput] * outputError[toOutput];
-            }
-            hiddenError[hidden] = dtanh(hiddenNeurons[hidden]) * contributionToOutputError;
-        }
-
-        ////////////////////////////////////////////////////////////////////////////
-        //WEIGHT UPDATE
-        ///////////////////////////////////////////////////////////////////////////
-        // Update first weight layer
-        for (int input = 0; input < inputs.length; input++)
-        {
-            for (int hidden = 0; hidden < hiddenNeurons.length; hidden++)
-            {
-
-                double saveAway = firstConnectionLayer[input][hidden];
-                firstConnectionLayer[input][hidden] += learningRate * hiddenError[hidden] * inputs[input];
-
-                if (Double.isNaN(firstConnectionLayer[input][hidden]))
-                {
-                    System.out.println("Late weight error! hiddenError " + hiddenError[hidden]
-                            + " input " + inputs[input] + " was " + saveAway);
-                }
-            }
-        }
-
-        // Update second weight layer
-        for (int hidden = 0; hidden < hiddenNeurons.length; hidden++)
-        {
-
-            for (int output = 0; output < outputs.length; output++)
-            {
-
-                double saveAway = secondConnectionLayer[hidden][output];
-                secondConnectionLayer[hidden][output] += learningRate * outputError[output] * hiddenNeurons[hidden];
-
-                if (Double.isNaN(secondConnectionLayer[hidden][output]))
-                {
-                    System.out.println("target: " + targetOutputs[output] + " outputs: " + outputs[output] + " error:" + outputError[output] + "\n" +
-                            "hidden: " + hiddenNeurons[hidden] + "\nnew conn weight: " + secondConnectionLayer[hidden][output] + " was: " + saveAway + "\n");
-                }
-            }
-        }
-
-        double summedOutputError = 0.0;
-        for (int k = 0; k < outputs.length; k++)
-        {
-            summedOutputError += Math.abs(targetOutputs[k] - outputs[k]);
-        }
-        summedOutputError /= outputs.length;
-
-        // Return something sensible
-        return summedOutputError;
-    }
-
     
     /**
      * calculate tanh for all values in the specified array
      * @param array: the array to use for calculations
      */
     private void tanh(double[] array) {
-        for (int i = 0; i < array.length; i++) {
-            array[i] = Math.tanh(array[i]);
-        }
+        for (int i = 0; i < array.length; array[i] = Math.tanh(array[i]), ++i);
     }
 
     /**
