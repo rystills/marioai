@@ -15,7 +15,7 @@ public class SmarterES implements EA {
     private final int evaluationRepetitions = 1; //only need one evaluation to determine member score
 
     /**
-     * construct a new SmarterES instance to handle evaluating and evolving our population 
+     * construct a new SmarterES instance to oversee the evaluation and evolution of our population 
      * @param task: the evaluation task to use (fitness function)
      * @param initial: the very first (entirely untrained) instance of our NN agent
      * @param populationSize: the total size of the population
