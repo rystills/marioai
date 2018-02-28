@@ -6,13 +6,14 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
 
     private double[][] firstConnectionLayer;
     private double[][] secondConnectionLayer;
-    private double[] hiddenNeurons;
-    private double[] outputs;
-    private double[] inputs;
-    public double mutationMagnitude = 0.1;
+    private double[] hiddenNeurons; //hidden layer
+    private double[] outputs; //output layer
+    private double[] inputs; //input layer
+    public double mutationMagnitude = 0.1; //severity multiplier applied to all mutations
 
-    public static double mean = 0.0f;        // initialization mean
-    public static double deviation = 0.1f;   // initialization deviation
+    //initial values
+    public static double mean = 0.0f; //initial mean
+    public static double deviation = 0.1f; //initial deviation
 
     public static final Random random = new Random();
     public double learningRate = 0.01;
@@ -24,7 +25,6 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
         secondConnectionLayer = new double[numberOfHidden][numberOfOutputs];
         hiddenNeurons = new double[numberOfHidden];
         outputs = new double[numberOfOutputs];
-        //targetOutputs = new double[numberOfOutputs];
         inputs = new double[numberOfInputs];
         initializeLayer(firstConnectionLayer);
         initializeLayer(secondConnectionLayer);
@@ -39,6 +39,9 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
         hiddenNeurons = new double[numberOfHidden];
         outputs = new double[numberOfOutputs];
     }
+    
+    //satisfy Evolvable implementation
+    public void reset() {}
 
     protected void initializeLayer(double[][] layer)
     {
@@ -135,18 +138,6 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
 
     }
 
-    private void clear(double[] array)
-    {
-        for (int i = 0; i < array.length; i++)
-        {
-            array[i] = 0;
-        }
-    }
-
-    public void reset()
-    {
-    }
-
     public double[] approximate(double[] doubles)
     {
         return propagate(doubles);
@@ -171,7 +162,9 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
 
     private void propagateOneStep(double[] fromLayer, double[] toLayer, double[][] connections)
     {
-        clear(toLayer);
+    	//clear toLayer for fresh calculations
+    	for (int i = 0; i < toLayer.length; toLayer[i] = 0, ++i);
+    	
         for (int from = 0; from < fromLayer.length; from++)
         {
             for (int to = 0; to < toLayer.length; to++)
@@ -261,119 +254,25 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
         return summedOutputError;
     }
 
-    private void tanh(double[] array)
-    {
-        for (int i = 0; i < array.length; i++)
-        {
+    
+    /**
+     * calculate tanh for all values in the specified array
+     * @param array: the array to use for calculations
+     */
+    private void tanh(double[] array) {
+        for (int i = 0; i < array.length; i++) {
             array[i] = Math.tanh(array[i]);
         }
     }
 
-    private double dtanh(double num) {
-        return (1 - (num * num));
-    }
+    /**
+     * approximate the hyperbolic tangent of the specified number
+     * @param num: the number with which to calculate
+     * @return the hyperbolic tangent of num
+     */
+    private double dtanh(double num) { return (1 - (num * num)); }
 
-    private double sum() {
-        double sum = 0;
-        for (double[] aFirstConnectionLayer : firstConnectionLayer)
-        {
-            for (double anAFirstConnectionLayer : aFirstConnectionLayer)
-            {
-                sum += anAFirstConnectionLayer;
-            }
-        }
-        for (double[] aSecondConnectionLayer : secondConnectionLayer)
-        {
-            for (double anASecondConnectionLayer : aSecondConnectionLayer)
-            {
-                sum += anASecondConnectionLayer;
-            }
-        }
-        return sum;
-    }
-
-    public double getMutationMagnitude() {
-        return mutationMagnitude;
-    }
-
-    public void setMutationMagnitude(double mutationMagnitude) {
-        this.mutationMagnitude = mutationMagnitude;
-    }
-
-    public static void setInitParameters(double mean, double deviation) {
-        System.out.println("PARAMETERS SET: " + mean + "  deviation: " + deviation);
-
-        SmarterMLP.mean = mean;
-        SmarterMLP.deviation = deviation;
-    }
-
-    public void setLearningRate(double learningRate) {
-        this.learningRate = learningRate;
-    }
-
-    public double[] getOutputs() {
-        double[] outputsCopy = new double[outputs.length];
-        System.arraycopy(outputs, 0, outputsCopy, 0, outputs.length);
-        return outputsCopy;
-    }
-
-    public double[] getWeightsArray() {
-        double[] weights = new double[inputs.length * hiddenNeurons.length + hiddenNeurons.length * outputs.length];
-
-        int k = 0;
-        for (int i = 0; i < inputs.length; i++)
-        {
-            for (int j = 0; j < hiddenNeurons.length; j++)
-            {
-                weights[k] = firstConnectionLayer[i][j];
-                k++;
-            }
-        }
-        for (int i = 0; i < hiddenNeurons.length; i++)
-        {
-            for (int j = 0; j < outputs.length; j++)
-            {
-                weights[k] = secondConnectionLayer[i][j];
-                k++;
-            }
-        }
-        return weights;
-    }
-
-    public void setWeightsArray(double[] weights)
-    {
-        int k = 0;
-
-        for (int i = 0; i < inputs.length; i++)
-        {
-            for (int j = 0; j < hiddenNeurons.length; j++)
-            {
-                firstConnectionLayer[i][j] = weights[k];
-                k++;
-            }
-        }
-        for (int i = 0; i < hiddenNeurons.length; i++)
-        {
-            for (int j = 0; j < outputs.length; j++)
-            {
-                secondConnectionLayer[i][j] = weights[k];
-                k++;
-            }
-        }
-    }
-
-    public void randomize() {
-    	randomize(firstConnectionLayer);
-    	randomize(secondConnectionLayer);
-    }
-
-    protected void randomize(double[][] layer) 	{
-        for (int i = 0; i < layer.length; i++)
-        {
-            for (int j = 0; j < layer[i].length; j++)
-            {
-                layer[i][j] = (Math.random() * 4.0) - 2.0;
-            }
-        }
-    }
+    //getters and setters for mutation magnitude
+    public double getMutationMagnitude() { return mutationMagnitude; }
+    public void setMutationMagnitude(double mutationMagnitude) { this.mutationMagnitude = mutationMagnitude; }
 }
