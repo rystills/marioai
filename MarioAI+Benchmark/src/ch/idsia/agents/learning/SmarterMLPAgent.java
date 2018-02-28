@@ -215,8 +215,11 @@ public class SmarterMLPAgent implements Agent, Evolvable
     			checkAboutToStomp() ? 1 : 0,
     			checkMovedDown() ? 1 : 0,
     			marioMode == 2 ? 1 : 0,
+    			marioMode == 0 ? 1 : 0,
     			isMarioOnGround ? 1 : 0,
-    			isMarioAbleToJump ? 1 : 0
+    			isMarioAbleToJump ? 1 : 0,
+    			isMarioAbleToShoot ? 1 : 0
+    			
     	};
         double[] outputs = mlp.propagate(inputs);
         boolean[] action = new boolean[numberOfOutputs];
