@@ -226,7 +226,7 @@ public class SmarterMLPAgent implements Agent, Evolvable {
     	//construct our output layer by propagating our hidden layer from our inputs
         double[] outputs = mlp.propagate(inputs);
         
-        //clamp outputs to 0/1 to map to keypresses
+        //map outputs to 0/1 for keypresses
         boolean[] action = new boolean[numberOfOutputs];
         for (int i = 0; i < action.length; action[i] = outputs[i] > 0, ++i);
         

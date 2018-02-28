@@ -124,7 +124,7 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
     }
 
     /**
-     * recombine this NN's internal layers from the specified parent NNs
+     * recombine this NN's internal layers from the specified parent NNs, using the psoRecombination algorithm
      * @param last: the starting NN
      * @param pBest: the first elite parent
      * @param gBest: the second elite parent
@@ -135,25 +135,43 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
 
         double phi1 = phi * random.nextDouble();
         double phi2 = phi * random.nextDouble();
-        
+                
         for (int i = 0; i < inputs.length; i++) {
             for (int j = 0; j < hiddenNeurons.length; j++) {
-                firstConnectionLayer[i][j] = (double) (firstConnectionLayer[i][j] + ki * (firstConnectionLayer[i][j] 
-                		- ((double[][]) (last.firstConnectionLayer))[i][j]
-                        + phi1 * (((double[][]) (pBest.firstConnectionLayer))[i][j] - firstConnectionLayer[i][j])
-                        + phi2 * (((double[][]) (gBest.firstConnectionLayer))[i][j] - firstConnectionLayer[i][j])));
+                recombineLayerIndices(firstConnectionLayer, last.firstConnectionLayer, 
+                		pBest.firstConnectionLayer, gBest.firstConnectionLayer, ki, phi1, phi2, i, j);
             }
         }
 
         for (int i = 0; i < hiddenNeurons.length; i++) {
             for (int j = 0; j < outputs.length; j++) {
-                secondConnectionLayer[i][j] = (double) (secondConnectionLayer[i][j] + ki * (secondConnectionLayer[i][j] 
-                		- ((double[][]) (last.secondConnectionLayer))[i][j]
-                        + phi1 * (((double[][]) (pBest.secondConnectionLayer))[i][j] - secondConnectionLayer[i][j])
-                        + phi2 * (((double[][]) (gBest.secondConnectionLayer))[i][j] - secondConnectionLayer[i][j])));
+            	recombineLayerIndices(secondConnectionLayer, last.secondConnectionLayer, 
+                		pBest.secondConnectionLayer, gBest.secondConnectionLayer, ki, phi1, phi2, i, j);
             }
         }
 
+    }
+    
+    /**
+     * recombine the specified indices of the desired layer, using the specified inputs
+     * @param ourLayer: the layer (first or second) on which to perform recombination
+     * @param lastLayer: the starting NN layer
+     * @param pBestLayer: the first parent NN layer
+     * @param gBestLayer: the second parent NN layer
+     * @param ki: offset magnitude
+     * @param phi1: first random offset applied to mutation constant phi
+     * @param phi2: second random offset applied to mutation constant phi
+     * @param i: first index
+     * @param j: second index
+     */
+    public void recombineLayerIndices(double[][] ourLayer, double[][]lastLayer, double[][]pBestLayer, 
+    		double[][]gBestLayer, double ki, double phi1, double phi2, int i, int j) {
+    	ourLayer[i][j] = (double) (ourLayer[i][j] + ki * (ourLayer[i][j] 
+    		- ((double[][]) (lastLayer))[i][j]
+    		+ phi1 * (((double[][]) (pBestLayer))[i][j] - ourLayer[i][j])
+    		+ phi2 * (((double[][]) (gBestLayer))[i][j] - ourLayer[i][j])));
+            
+        
     }
 
     /**
