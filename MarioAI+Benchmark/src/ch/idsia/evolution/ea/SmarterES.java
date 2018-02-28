@@ -11,7 +11,7 @@ public class SmarterES implements EA {
     private final Evolvable[] population; //list of all population members
     private final float[] fitness; //list of all members' fitness
     private final int elite; //number of population members which survive between generations (elite = p, population-elite = c)
-    private final Task task; //evaluation task 
+    public final Task task; //evaluation task (simulation)
     private final int evaluationRepetitions = 1; //only need one evaluation to determine member score
 
     /**

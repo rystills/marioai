@@ -159,8 +159,8 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
      * @param pBestLayer: the first parent NN layer
      * @param gBestLayer: the second parent NN layer
      * @param ki: offset magnitude
-     * @param phi1: first random offset applied to mutation constant phi
-     * @param phi2: second random offset applied to mutation constant phi
+     * @param phi1: first random offset applied to combination constant phi
+     * @param phi2: second random offset applied to combination constant phi
      * @param i: first index
      * @param j: second index
      */
@@ -169,9 +169,7 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
     	ourLayer[i][j] = (double) (ourLayer[i][j] + ki * (ourLayer[i][j] 
     		- ((double[][]) (lastLayer))[i][j]
     		+ phi1 * (((double[][]) (pBestLayer))[i][j] - ourLayer[i][j])
-    		+ phi2 * (((double[][]) (gBestLayer))[i][j] - ourLayer[i][j])));
-            
-        
+    		+ phi2 * (((double[][]) (gBestLayer))[i][j] - ourLayer[i][j]))); 
     }
 
     /**
