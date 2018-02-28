@@ -14,7 +14,7 @@ import ch.idsia.evolution.SmarterMLP;
 public class SmarterMLPAgent implements Agent, Evolvable
 {
 
-    private SmarterMLP mlp;
+    public SmarterMLP mlp;
     private String name = "SimpleMLPAgent";
     final int numberOfOutputs = 6;
     final int numberOfInputs = 10;
@@ -107,6 +107,11 @@ public class SmarterMLPAgent implements Agent, Evolvable
     
     public void mutate(float mutationMagnitude) {
     	mlp.mutate(mutationMagnitude);
+    }
+    
+    public void recombine(SmarterMLPAgent parent1, SmarterMLPAgent parent2) {
+    	//TODO: consider using another mlp for last, rather than the current mlp (which is still just a fresh copy of an elite)
+    	this.mlp.psoRecombine(this.mlp, parent1.mlp, parent2.mlp);
     }
     
     public boolean[] getAction()

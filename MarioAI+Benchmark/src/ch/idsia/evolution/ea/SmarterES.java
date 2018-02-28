@@ -41,8 +41,14 @@ public class SmarterES implements EA
         }
         for (int i = elite; i < population.length; i++)
         {
+        	//TODO: this ignores some elites if elite > population.length/2, and pulls from some non-elites if elites < population.length/2; force multiples of 2
             population[i] = population[i - elite].copy();
             SmarterMLPAgent sm = (SmarterMLPAgent)population[i];
+            //chose two parents from the elite class to use for recombination
+            //TODO: random elite selection is arguable
+            int parent1Index = (int) (Math.random() * elite);
+            int parent2Index = (int) (Math.random() * elite);
+            sm.recombine((SmarterMLPAgent)population[parent1Index],(SmarterMLPAgent)population[parent2Index]);
             sm.mutate(mutationMagnitude);
             evaluate(i);
         }
