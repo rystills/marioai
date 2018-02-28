@@ -17,8 +17,8 @@ import ch.idsia.utils.wox.serial.Easy;
  */
 public class mainEvolveScalingMutation
 {
-    final static int generations = 1;
-    final static int populationSize = 25;
+    final static int generations = 30;
+    final static int populationSize = 50;
 
     public static void main(String[] args)
     {
@@ -26,10 +26,11 @@ public class mainEvolveScalingMutation
         options.setPauseWorld(false);
         Evolvable initial = new SmarterMLPAgent();
         options.setFPS(GlobalOptions.MaxFPS);
-        options.setLevelDifficulty(0);
+        options.setLevelDifficulty(25);
+        options.setLevelRandSeed(2);
         options.setVisualization(false);
         ProgressTask task = new ProgressTask(options); //defines fitness function
-        options.setLevelRandSeed((int) (Math.random() * Integer.MAX_VALUE));
+        //options.setLevelRandSeed((int) (Math.random() * Integer.MAX_VALUE));
         SmarterES es = new SmarterES(task, initial, populationSize, populationSize/2);
         System.out.println("Evolving " + initial + " with task " + task);   
         final String fileName = "evolved" + (int) (Math.random() * Integer.MAX_VALUE) + ".xml";
