@@ -17,7 +17,7 @@ import ch.idsia.utils.wox.serial.Easy;
  */
 public class mainEvolveScalingMutation
 {
-    final static int generations = 100;
+    final static int generations = 1;
     final static int populationSize = 25;
 
     public static void main(String[] args)

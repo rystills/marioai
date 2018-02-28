@@ -50,6 +50,7 @@ public class SmarterMLPAgent implements Agent, Evolvable
     int zLevelEnemies = 0;
 
 	//persistent variables for stateful logic
+    float prevX = 0;
     float prevY = 0;
     protected int[] marioCenter;
 
@@ -185,6 +186,15 @@ public class SmarterMLPAgent implements Agent, Evolvable
 		}
     	return false;
 	}
+	
+	/**
+	 * check whether or not mario is running
+	 * @return: whether mario is running (true) or not (false)
+	 */
+	public boolean isMarioRunning() {
+		//max speed when running appears to be a little over 10; 8 should be enough to get the NN on the right track
+		return Math.abs(marioFloatPos[0] - prevX) >= 8; 
+	}
     
 	public int getReceptiveFieldCellValue(int x, int y)
 	{
@@ -218,7 +228,7 @@ public class SmarterMLPAgent implements Agent, Evolvable
     			marioMode == 0 ? 1 : 0,
     			isMarioOnGround ? 1 : 0,
     			isMarioAbleToJump ? 1 : 0,
-    			isMarioAbleToShoot ? 1 : 0
+    			isMarioRunning() ? 0 : 1
     			
     	};
         double[] outputs = mlp.propagate(inputs);
@@ -229,6 +239,7 @@ public class SmarterMLPAgent implements Agent, Evolvable
         
         //update persistent variables
 	    prevY = marioFloatPos[1];
+	    prevX = marioFloatPos[0];
 	    
         return action;
     }

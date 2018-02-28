@@ -11,6 +11,7 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	boolean wAppro = false;
 	boolean gAppro = false;
 	boolean eAppro = false;
+	float prevX = 0;
 	float prevY = 0;
 	
 	public SmarterForwardAgent() {
@@ -204,7 +205,9 @@ public class SmarterForwardAgent extends BasicMarioAIAgent implements Agent {
 	   checkAboutToStomp();
 	    
 	   //update persistent variables
-	    prevY = marioFloatPos[1];
+	   System.out.println(marioFloatPos[0] - prevX);
+	   prevX = marioFloatPos[0];
+	   prevY = marioFloatPos[1]; 
 	    
 	    //return final results
 	    return action;
