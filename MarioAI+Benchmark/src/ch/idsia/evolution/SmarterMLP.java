@@ -82,9 +82,17 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable
         }
         return copy;
     }
+    
+    public void mutate() {
+    	mutate(firstConnectionLayer);
+        mutate(secondConnectionLayer);
+    }
 
-    public void mutate()
+    public void mutate(float newMutationMagnitude)
     {
+    	if (newMutationMagnitude != -1) {
+    		setMutationMagnitude(newMutationMagnitude);	
+    	}
         mutate(firstConnectionLayer);
         mutate(secondConnectionLayer);
     }

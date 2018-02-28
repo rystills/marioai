@@ -104,7 +104,11 @@ public class SmarterMLPAgent implements Agent, Evolvable
 
     public void mutate()
     { mlp.mutate(); }
-
+    
+    public void mutate(float mutationMagnitude) {
+    	mlp.mutate(mutationMagnitude);
+    }
+    
     public boolean[] getAction()
     {
 //        double[] inputs = new double[]{probe(-1, -1, levelScene), probe(0, -1, levelScene), probe(1, -1, levelScene),

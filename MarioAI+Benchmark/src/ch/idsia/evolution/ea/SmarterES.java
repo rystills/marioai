@@ -1,6 +1,7 @@
 package ch.idsia.evolution.ea;
 
 import ch.idsia.agents.Agent;
+import ch.idsia.agents.learning.SmarterMLPAgent;
 import ch.idsia.benchmark.tasks.Task;
 import ch.idsia.evolution.EA;
 import ch.idsia.evolution.Evolvable;
@@ -20,7 +21,7 @@ public class SmarterES implements EA
     private final Task task;
     private final int evaluationRepetitions = 1;
 
-    public SmarterES(Task task, Evolvable initial, int populationSize)
+    public SmarterES(Task task, Evolvable initial, int populationSize, int numParents)
     {
         this.population = new Evolvable[populationSize];
         for (int i = 0; i < population.length; i++)
@@ -28,11 +29,11 @@ public class SmarterES implements EA
             population[i] = initial.getNewInstance();
         }
         this.fitness = new float[populationSize];
-        this.elite = populationSize / 2;
+        this.elite = numParents;
         this.task = task;
     }
 
-    public void nextGeneration()
+    public void nextGeneration(float mutationMagnitude)
     {
         for (int i = 0; i < elite; i++)
         {
@@ -41,11 +42,16 @@ public class SmarterES implements EA
         for (int i = elite; i < population.length; i++)
         {
             population[i] = population[i - elite].copy();
-            population[i].mutate();
+            SmarterMLPAgent sm = (SmarterMLPAgent)population[i];
+            sm.mutate(mutationMagnitude);
             evaluate(i);
         }
         shuffle();
         sortPopulationByFitness();
+    }
+    
+    public void nextGeneration() {
+    	nextGeneration(-1);
     }
 
     private void evaluate(int which)

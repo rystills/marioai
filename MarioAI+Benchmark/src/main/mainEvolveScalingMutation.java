@@ -15,7 +15,7 @@ import ch.idsia.utils.wox.serial.Easy;
  * Date: Jun 14, 2009
  * Time: 2:15:51 PM
  */
-public class mainEvolve
+public class mainEvolveScalingMutation
 {
     final static int generations = 100;
     final static int populationSize = 25;
@@ -31,14 +31,17 @@ public class mainEvolve
         ProgressTask task = new ProgressTask(options); //defines fitness function
         options.setLevelRandSeed((int) (Math.random() * Integer.MAX_VALUE));
         SmarterES es = new SmarterES(task, initial, populationSize, populationSize/2);
-        System.out.println("Evolving " + initial + " with task " + task);
+        System.out.println("Evolving " + initial + " with task " + task);   
         final String fileName = "evolved" + (int) (Math.random() * Integer.MAX_VALUE) + ".xml";
+        
+        float mutationMagnitude = .3f;
         for (int gen = 0; gen < generations; gen++)
         {
         	if (gen == generations-1) {
         		options.setVisualization(true);
         	}
-            es.nextGeneration();
+            es.nextGeneration(mutationMagnitude);
+            mutationMagnitude -= .003f;
             double bestResult = es.getBestFitnesses()[0];
             System.out.println("Generation " + gen + " best " + bestResult);
             Easy.save(es.getBests()[0], fileName);
