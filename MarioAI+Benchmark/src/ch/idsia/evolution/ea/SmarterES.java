@@ -6,41 +6,46 @@ import ch.idsia.benchmark.tasks.Task;
 import ch.idsia.evolution.EA;
 import ch.idsia.evolution.Evolvable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: julian
- * Date: Apr 29, 2009
- * Time: 12:16:49 PM
- */
-public class SmarterES implements EA
-{
+public class SmarterES implements EA {
 
-    private final Evolvable[] population;
-    private final float[] fitness;
-    private final int elite;
-    private final Task task;
-    private final int evaluationRepetitions = 1;
+    private final Evolvable[] population; //list of all population members
+    private final float[] fitness; //list of all members' fitness
+    private final int elite; //number of population members which survive between generations (elite = p, population-elite = c)
+    private final Task task; //evaluation task 
+    private final int evaluationRepetitions = 1; //only need one evaluation to determine member score
 
-    public SmarterES(Task task, Evolvable initial, int populationSize, int numParents)
-    {
-        this.population = new Evolvable[populationSize];
-        for (int i = 0; i < population.length; i++)
-        {
-            population[i] = initial.getNewInstance();
-        }
+    /**
+     * construct a new SmarterES instance to handle evaluating and evolving our population 
+     * @param task: the evaluation task to use (fitness function)
+     * @param initial: the very first (entirely untrained) instance of our NN agent
+     * @param populationSize: the total size of the population
+     * @param numParents: how many individuals in our population are parents (elites); the remaining slots are used for children
+     */
+    public SmarterES(Task task, Evolvable initial, int populationSize, int numParents) {
+        //create our starting population, filled with instances of our starting agent
+    	this.population = new Evolvable[populationSize];
+        for (int i = 0; i < population.length; population[i] = initial.getNewInstance(), ++i);
+        
+        //create our starting fitness values (won't be filled in properly until the end of each trial)
         this.fitness = new float[populationSize];
+        
         this.elite = numParents;
         this.task = task;
     }
+    
+    //satisfy EA implementation
+    public Evolvable[] getBests() { return new Evolvable[]{ population[0]}; }
+    public float[] getBestFitnesses() { return new float[]{ fitness[0]}; }
 
-    public void nextGeneration(float mutationMagnitude)
-    {
-        for (int i = 0; i < elite; i++)
-        {
-            evaluate(i);
-        }
-        for (int i = elite; i < population.length; i++)
-        {
+    /**
+     * generate the next generation of children, using the specified mutation magnitude
+     * @param mutationMagnitude: the mutation magnitude to use when mutating children (specify -1 to use current magnitude)
+     */
+    public void nextGeneration(float mutationMagnitude) {
+    	//evaluate each of the elites (survivors of previous generation) to determine their fitness
+        for (int i = 0; i < elite; evaluate(i), ++i);
+        
+        for (int i = elite; i < population.length; i++) {
         	//TODO: this ignores some elites if elite > population.length/2, and pulls from some non-elites if elites < population.length/2; force multiples of 2
             population[i] = population[i - elite].copy();
             SmarterMLPAgent sm = (SmarterMLPAgent)population[i];
@@ -56,62 +61,58 @@ public class SmarterES implements EA
         sortPopulationByFitness();
     }
     
+    /**
+     * generate the next generation of children, using the current mutation magnitude
+     */
     public void nextGeneration() {
     	nextGeneration(-1);
     }
 
-    private void evaluate(int which)
-    {
+    private void evaluate(int which) {
         fitness[which] = 0;
         for (int i = 0; i < evaluationRepetitions; i++)
         {
             population[which].reset();
             fitness[which] += task.evaluate((Agent) population[which])[0];
-//            System.out.println("which " + which + " fitness " + fitness[which]);
         }
         fitness[which] = fitness[which] / evaluationRepetitions;
     }
 
-    private void shuffle()
-    {
-        for (int i = 0; i < population.length; i++)
-        {
-            swap(i, (int) (Math.random() * population.length));
+    /**
+     * shuffle the population, swapping each member with another member chosen at random
+     */
+    private void shuffle() {
+        for (int i = 0; i < population.length; i++) {
+            swapPopAndFitness(i, (int) (Math.random() * population.length));
         }
     }
 
-    private void sortPopulationByFitness()
-    {
-        for (int i = 0; i < population.length; i++)
-        {
-            for (int j = i + 1; j < population.length; j++)
-            {
-                if (fitness[i] < fitness[j])
-                {
-                    swap(i, j);
+    /**
+     * use a naive sort to sort the population from highest to lowest fitness
+     */
+    private void sortPopulationByFitness() {
+        for (int i = 0; i < population.length; i++) {
+            for (int j = i + 1; j < population.length; j++) {
+                if (fitness[i] < fitness[j]) {
+                	swapPopAndFitness(i, j);
                 }
             }
         }
     }
 
-    private void swap(int i, int j)
-    {
-        float cache = fitness[i];
-        fitness[i] = fitness[j];
-        fitness[j] = cache;
-        Evolvable gcache = population[i];
+    /**
+     * swap the population members at the specified indices, along with their fitness values
+     * @param i: the index of the first member
+     * @param j: the index of the second member
+     */
+    private void swapPopAndFitness(int i, int j) {
+    	//swap population
+    	Evolvable gcache = population[i];
         population[i] = population[j];
         population[j] = gcache;
+        //swap fitness
+    	float cache = fitness[i];
+        fitness[i] = fitness[j];
+        fitness[j] = cache;
     }
-
-    public Evolvable[] getBests()
-    {
-        return new Evolvable[]{population[0]};
-    }
-
-    public float[] getBestFitnesses()
-    {
-        return new float[]{fitness[0]};
-    }
-
 }
