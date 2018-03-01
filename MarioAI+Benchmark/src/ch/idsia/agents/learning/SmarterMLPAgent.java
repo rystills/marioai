@@ -150,6 +150,68 @@ public class SmarterMLPAgent implements Agent, Evolvable {
 	}
 	
 	/**
+     * check if we are approaching a gap that is still far from us
+     * @return whether we are approaching a far gap (true) or not (false)
+     */
+    private boolean gapApproachingFar() {
+    	return getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1] + 2) == 0;
+    }
+    
+    /**
+     * check if we are approaching a gap that is close to us
+     * @return whether we are approaching a close gap (true) or not (false)
+     */
+    private boolean gapApproachingClose() {
+    	return getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1] + 1) == 0;
+    }
+    
+    /**
+     * check if we are approaching a wall that is still far from us
+     * @return whether we are approaching a far wall (true) or not (false)
+     */
+    private boolean wallApproachingFar() {
+    	return getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 2) != 0;
+    }
+    
+    /**
+     * check if we are approaching a wall that is close to us
+     * @return whether we are approaching a close wall (true) or not (false)
+     */
+    private boolean wallApproachingClose() {
+    	return getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) != 0;
+    }
+    
+    /**
+	 * check if there is an enemy far from us
+	 * @return: whether there is an enemy far in front of us (true) or not (false)
+	 */
+    private boolean enemyApproachingFar() {
+    	for (int i = 0; i < enemiesFloatPos.length; i+=3) {
+			float ex = enemiesFloatPos[i+1];
+			//check if any enemies x vales are within a small area around mario
+			if (ex <= 48 && ex >= 25) {
+				return true;
+			}
+		}
+		return false;
+    }
+    
+    /**
+	 * check if there is an enemy close to us
+	 * @return: whether there is an enemy close in front of us (true) or not (false)
+	 */
+    private boolean enemyApproachingClose() {
+    	for (int i = 0; i < enemiesFloatPos.length; i+=3) {
+			float ex = enemiesFloatPos[i+1];
+			//check if any enemies x vales are within a small area around mario
+			if (ex <= 24 && ex >= -16) {
+				return true;
+			}
+		}
+		return false;
+    }
+	
+	/**
 	 * check if we moved down since last frame; if so, force trueJumpCounter to 0 and stop holding jump
 	 * @return: whether or not we moved down since last frame and had trueJumpCounter > 1
 	 */
