@@ -10,7 +10,7 @@ import ch.idsia.tools.CmdLineOptions;
 import ch.idsia.utils.wox.serial.Easy;
 
 public class mainEvolveScalingMutation {
-    final static int generations = 3;
+    final static int generations = 30;
     final static int populationSize = 50;
 
     public static void main(String[] args) {
@@ -22,7 +22,7 @@ public class mainEvolveScalingMutation {
         options.setLevelRandSeed(2);
         options.setVisualization(false);
         ProgressTask task = new ProgressTask(options); //defines fitness function
-        SmarterES es = new SmarterES(task, initial, populationSize, populationSize/2);
+        SmarterES es = new SmarterES(task, initial, populationSize, populationSize/2); //set an even split of 25 parents - 25 children
         System.out.println("Evolving " + initial + " with task " + task);   
         final String fileName = "evolved" + (int) (Math.random() * Integer.MAX_VALUE) + ".xml";
         

@@ -173,7 +173,7 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
     }
 
     /**
-     * propogate the specified inputs through our NN, returning the resulting outputs
+     * propagate the specified inputs through our NN, returning the resulting outputs
      * @param inputIn: the input data we collected
      * @return the output values calculated by our NN
      */
@@ -192,7 +192,7 @@ public class SmarterMLP implements FA<double[], double[]>, Evolvable {
     }
 
     /**
-     * propogate the values from fromLayer over to toLayer by a factor of connections
+     * propagate the values from fromLayer over to toLayer by a factor of connections
      * @param fromLayer: the initial layer
      * @param toLayer: the destination layer
      * @param connections: the connections defining the relation between fromLayer and toLayer

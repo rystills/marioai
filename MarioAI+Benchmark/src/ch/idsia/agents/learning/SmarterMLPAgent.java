@@ -107,7 +107,6 @@ public class SmarterMLPAgent implements Agent, Evolvable {
     }
     
     public void recombine(SmarterMLPAgent parent1, SmarterMLPAgent parent2) {
-    	//TODO: consider using another mlp for last, rather than the current mlp (which is still just a fresh copy of an elite)
     	this.mlp.psoRecombine(this.mlp, parent1.mlp, parent2.mlp);
     }
     
