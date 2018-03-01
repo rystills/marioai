@@ -11,18 +11,17 @@ import ch.idsia.utils.wox.serial.Easy;
 
 public class mainEvolveScalingMutation {
     final static int generations = 30;
-    final static int populationSize = 50;
 
     public static void main(String[] args) {
         CmdLineOptions options = new CmdLineOptions(new String[0]);
         options.setPauseWorld(false);
         Evolvable initial = new SmarterMLPAgent();
         options.setFPS(GlobalOptions.MaxFPS);
-        options.setLevelDifficulty(25); //change level difficulty
+        options.setLevelDifficulty(0); //change level difficulty
         options.setLevelRandSeed(2); //change level seed
         options.setVisualization(false);
         ProgressTask task = new ProgressTask(options); //defines fitness function
-        SmarterES es = new SmarterES(task, initial, populationSize, populationSize/2); //set an even split of 25 parents - 25 children
+        SmarterES es = new SmarterES(task, initial, 50, 25); //50 total population, with 25 parents = 25 children (even split)
         System.out.println("Evolving " + initial + " with task " + task);   
         final String fileName = "evolved" + (int) (Math.random() * Integer.MAX_VALUE) + ".xml";
         
