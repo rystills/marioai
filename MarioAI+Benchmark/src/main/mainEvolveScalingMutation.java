@@ -18,18 +18,21 @@ public class mainEvolveScalingMutation {
         options.setPauseWorld(false);
         Evolvable initial = new SmarterMLPAgent();
         options.setFPS(GlobalOptions.MaxFPS);
-        options.setLevelDifficulty(25);
-        options.setLevelRandSeed(2);
+        options.setLevelDifficulty(25); //change level difficulty
+        options.setLevelRandSeed(2); //change level seed
         options.setVisualization(false);
         ProgressTask task = new ProgressTask(options); //defines fitness function
         SmarterES es = new SmarterES(task, initial, populationSize, populationSize/2); //set an even split of 25 parents - 25 children
         System.out.println("Evolving " + initial + " with task " + task);   
         final String fileName = "evolved" + (int) (Math.random() * Integer.MAX_VALUE) + ".xml";
         
-        float mutationMagnitude = .3f;
+        boolean scalingMutation = true; //whether we should use a constant or scaling mutation
+        float mutationMagnitude = .3f; //starting mutation magnitude, if using scaling mutation
+        float mutationReductionRate = .003f; //rate at which our mutation magnitude should reduce after each generation
+        
         for (int gen = 0; gen < generations; gen++) {
-            es.nextGeneration(mutationMagnitude);
-            mutationMagnitude -= .003f;
+            es.nextGeneration(scalingMutation ? mutationMagnitude : -1);
+            mutationMagnitude -= mutationReductionRate;
             double bestResult = es.getBestFitnesses()[0];
             System.out.println("Generation " + gen + " best " + bestResult);
             Easy.save(es.getBests()[0], fileName);
