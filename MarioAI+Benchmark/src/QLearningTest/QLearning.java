@@ -119,18 +119,19 @@ public class QLearning {
                 float diceRoll = rand.nextFloat();
                 int index;
                 if (diceRoll <= epsilon) {
-                	//chosoe index at random
+                	//choose index at random
                 	index = rand.nextInt(actionsFromState.length);
                 }
                 else {
                 	//choose index with largest value
                 	index = 0;
-                	for (int j = 0; j < actionsFromState.length; ++j) {
+                	for (int j = 1; j < actionsFromState.length; ++j) {
                 		if (actionsFromState[j] > actionsFromState[index]) {
                 			index = j;
                 		}
                 	}
                 }
+                
                 int action = actionsFromState[index];
  
                 // Action outcome is set to deterministic in this example
@@ -140,13 +141,27 @@ public class QLearning {
  
                 // Using this possible action, consider to go to the next state
                 double q = Q(state, action);
-                double maxQ = maxQ(nextState);
+                //double maxQ = maxQ(nextState);
                 int r = R(state, action);
  
-                double value = q + alpha * (r + gamma * maxQ - q);
-                setQ(state, action, value);
- 
                 // Set the next state as the current state
+                //state = nextState;
+                
+                //sarsa
+                float rand1= rand.nextFloat();
+                int action2;
+                if (rand1 <.05) {
+                index = rand.nextInt(actionsFromState.length);
+                action2 = actionsFromState[index];
+                }
+                else {
+                action2 = policy(nextState);
+                }
+                Double actQ = Q(nextState, action2);
+
+                //sarsa update
+                double value = q + alpha * (r + gamma * actQ - q);
+                setQ(state, action, value);
                 state = nextState;
             }
             System.out.print(state);
