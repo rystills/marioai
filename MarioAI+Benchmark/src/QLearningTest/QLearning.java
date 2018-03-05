@@ -1,6 +1,8 @@
 package QLearningTest;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
  
 /**
@@ -91,6 +93,7 @@ public class QLearning {
  
         // For each episode
         Random rand = new Random();
+        final float epsilon = .05f;
         for (int i = 0; i < 10000; i++) { // train episodes
             // Select random initial state
         	System.out.println();
@@ -113,7 +116,21 @@ public class QLearning {
                  
                 // Selection strategy is random in this example
                 // change it to e-greedy
-                int index = rand.nextInt(actionsFromState.length);
+                float diceRoll = rand.nextFloat();
+                int index;
+                if (diceRoll <= epsilon) {
+                	//chosoe index at random
+                	index = rand.nextInt(actionsFromState.length);
+                }
+                else {
+                	//choose index with largest value
+                	index = 0;
+                	for (int j = 0; j < actionsFromState.length; ++j) {
+                		if (actionsFromState[j] > actionsFromState[index]) {
+                			index = j;
+                		}
+                	}
+                }
                 int action = actionsFromState[index];
  
                 // Action outcome is set to deterministic in this example
