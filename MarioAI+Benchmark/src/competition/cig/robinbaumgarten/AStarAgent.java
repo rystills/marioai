@@ -6,8 +6,8 @@ package competition.cig.robinbaumgarten;
  * To Public License, Version 2, as published by Sam Hocevar. See
  * http://sam.zoy.org/wtfpl/COPYING for more details. */ 
 
-import ch.idsia.ai.agents.Agent;
-import ch.idsia.mario.environments.Environment;
+import ch.idsia.agents.Agent;
+import ch.idsia.benchmark.mario.environments.Environment;
 
 import competition.cig.robinbaumgarten.astar.AStarSimulator;
 import competition.cig.robinbaumgarten.astar.sprites.Mario;
@@ -20,13 +20,16 @@ public class AStarAgent implements Agent
     private float lastX = 0;
     private float lastY = 0;
     
+    //standard integrated data
+    private Environment observation;
+    
     public void reset()
     {
         action = new boolean[Environment.numberOfButtons];
         sim = new AStarSimulator();
     }
 
-    public boolean[] getAction(Environment observation)
+    public boolean[] getAction()
     {
     	// This is the main function that is called by the mario environment.
     	// we're supposed to compute and return an action in here.
@@ -93,10 +96,10 @@ public class AStarAgent implements Agent
         return action;
     }
 
-    public AGENT_TYPE getType()
-    {
-        return Agent.AGENT_TYPE.AI;
-    }
+//    public AGENT_TYPE getType()
+//    {
+//        return Agent.AGENT_TYPE.AI;
+//    }
 
     public String getName() 
     {        
@@ -107,4 +110,12 @@ public class AStarAgent implements Agent
     { 
     	this.name = Name;    
     }
+
+	@Override
+	public void integrateObservation(Environment environment) {
+		this.observation = environment;		
+	}
+
+	@Override
+	public void giveIntermediateReward(float intermediateReward) {}
 }
