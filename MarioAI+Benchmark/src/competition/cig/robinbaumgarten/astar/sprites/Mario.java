@@ -1,6 +1,6 @@
 package competition.cig.robinbaumgarten.astar.sprites;
 
-import ch.idsia.mario.engine.GlobalOptions;
+import ch.idsia.benchmark.mario.engine.GlobalOptions;
 
 import competition.cig.robinbaumgarten.astar.LevelScene;
 import competition.cig.robinbaumgarten.astar.level.Level;
@@ -277,7 +277,7 @@ public class Mario extends Sprite implements Cloneable
             world.addSprite(new Fireball(world, x+facing*6, y-20, facing));
         }
 
-        world.paused = GlobalOptions.pauseWorld;
+        world.paused = GlobalOptions.isPauseWorld;
         canShoot = !keys[KEY_SPEED];
 
         mayJump = (onGround || sliding) && !keys[KEY_JUMP];
