@@ -6,7 +6,7 @@ import ch.idsia.benchmark.mario.engine.level.SpriteTemplate;
 
 import java.awt.*;
 
-public class Sprite
+public class Sprite implements Cloneable
 {
 public static final int KIND_NONE = 0;
 public static final int KIND_MARIO = -31;
@@ -127,6 +127,15 @@ public void render(Graphics og)
         og.setColor(Color.GREEN);
         MarioVisualComponent.drawString(og, String.valueOf(this.kind), (int) x - 4, (int) y - 8, 2);
     }
+}
+
+@Override
+public Object clone() throws CloneNotSupportedException
+{
+	Sprite s = (Sprite) super.clone();
+	if (spriteTemplate != null)
+		s.spriteTemplate = (SpriteTemplate) this.spriteTemplate.clone();
+	return s;
 }
 
 public final void tick()

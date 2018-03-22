@@ -7,7 +7,7 @@ import ch.idsia.benchmark.mario.engine.sprites.Sprite;
 
 import java.io.Serializable;
 
-public class SpriteTemplate implements Serializable
+public class SpriteTemplate implements Serializable, Cloneable
 {
 public int lastVisibleTick = -1;
 public Sprite sprite;
@@ -57,6 +57,13 @@ public SpriteTemplate(int type)
             this.winged = false;
             break;
     }
+}
+
+@Override
+public Object clone() throws CloneNotSupportedException
+{
+	return super.clone();
+	
 }
 
 public void spawn(LevelScene world, int x, int y, int dir)
