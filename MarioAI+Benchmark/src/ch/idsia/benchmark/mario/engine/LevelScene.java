@@ -19,7 +19,7 @@ public static final String[] keysStr = {"<<L ", "R>> ", "\\\\//", "JUMP", " RUN"
 
 public static final int cellSize = 16;
 
-final public List<Sprite> sprites = new ArrayList<Sprite>();
+public List<Sprite> sprites = new ArrayList<Sprite>();
 final private List<Sprite> spritesToAdd = new ArrayList<Sprite>();
 final private List<Sprite> spritesToRemove = new ArrayList<Sprite>();
 
@@ -115,7 +115,7 @@ public static List<Sprite> cloneList(List<Sprite> list) throws CloneNotSupported
     		Sprite s = (Sprite) item.clone();
     		if (s.kind == Sprite.KIND_SHELL && ((Shell) s).carried && c.mario.carried != null)
     			c.mario.carried = s;
-    		s.levelScene = c;
+    		//s.levelScene = c;
     		clone.add(s);
     	}
     }
