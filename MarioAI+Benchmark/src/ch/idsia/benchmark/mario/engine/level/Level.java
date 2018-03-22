@@ -1,8 +1,10 @@
 package ch.idsia.benchmark.mario.engine.level;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Level implements Serializable
+public class Level implements Serializable, Cloneable
 {
 private static final long serialVersionUID = -2222762134065697580L;
 
@@ -74,6 +76,14 @@ public SpriteTemplate[][] spriteTemplates;
 
 public int xExit;
 public int yExit;
+
+@Override
+public Object clone() throws CloneNotSupportedException
+{
+	//System.out.println("Cloning level, wh: "+width + " "+height);
+	Level l = (Level) super.clone();
+	return l;
+}
 
 public Level(int length, int height)
 {
