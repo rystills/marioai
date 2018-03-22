@@ -12,7 +12,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class LevelScene implements SpriteContext, Serializable
+public final class LevelScene implements SpriteContext, Serializable, Cloneable
 {
 public static final boolean[] defaultKeys = new boolean[Environment.numberOfButtons];
 public static final String[] keysStr = {"<<L ", "R>> ", "\\\\//", "JUMP", " RUN", "^UP^"};
@@ -89,6 +89,39 @@ public static int killedCreaturesTotal;
 public static int killedCreaturesByFireBall;
 public static int killedCreaturesByStomp;
 public static int killedCreaturesByShell;
+
+public static List<Sprite> cloneList(List<Sprite> list) throws CloneNotSupportedException {
+    List<Sprite> clone = new ArrayList<Sprite>(list.size());
+    for(Sprite item: list) clone.add((Sprite) item.clone());
+    return clone;
+}
+
+@Override protected Object clone() throws CloneNotSupportedException 
+{
+	LevelScene c = (LevelScene) super.clone();
+	c.mario = (Mario) this.mario.clone();
+	c.level = (Level) this.level.clone();
+	c.mario.levelScene = c;
+	
+	List<Sprite> clone = new ArrayList<Sprite>(this.sprites.size());
+    for(Sprite item: this.sprites) 
+    {
+    	if (item == mario)
+    	{
+    		clone.add(c.mario);
+    	}
+    	else
+    	{
+    		Sprite s = (Sprite) item.clone();
+    		if (s.kind == Sprite.KIND_SHELL && ((Shell) s).carried && c.mario.carried != null)
+    			c.mario.carried = s;
+    		s.levelScene = c;
+    		clone.add(s);
+    	}
+    }
+    c.sprites = clone;
+	return c;
+}
 
 //    private int[] args; //passed to reset method. ATTENTION: not cloned.
 

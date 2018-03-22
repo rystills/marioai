@@ -7,7 +7,7 @@ import ch.idsia.benchmark.mario.engine.level.Level;
 import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.tools.CmdLineOptions;
 
-public final class Mario extends Sprite
+public final class Mario extends Sprite implements Cloneable
 {
 private final int FractionalPowerUpTime = 0;
 public static final String[] MODES = new String[]{"small", "Large", "FIRE"};
@@ -62,6 +62,17 @@ public static void resetStatic(CmdLineOptions cmdLineOptions)
 
     isTrace = cmdLineOptions.isTrace();
 }
+
+@Override
+	public Object clone() throws CloneNotSupportedException
+   {
+   	Mario m = (Mario) super.clone();
+   	boolean[] k = new boolean[5];
+   	for (int i = 0; i < 5; i++)
+   		k[i] = keys[i];
+   	m.keys = k;
+   	return m;    	
+   }
 
 public int getMode()
 {
