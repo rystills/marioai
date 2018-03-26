@@ -1,5 +1,7 @@
 package QLearningAgents;
 
+import java.util.Random;
+
 import ch.idsia.agents.Agent;
 import ch.idsia.agents.controllers.BasicMarioAIAgent;
 import ch.idsia.benchmark.mario.engine.LevelScene;
@@ -8,6 +10,9 @@ import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 
 public class QAgent extends BasicMarioAIAgent implements Agent {
+	
+	//Q constants
+	final float epsilon = .05f;
 	
 	// path finding
     final double alpha = 0.1;
@@ -48,7 +53,34 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	public QAgent() {
 	    super("QAgent");
 	    reset();
+	    initRewards();
 	}
+	
+	public void initRewards() {
+		//rewards from A
+		
+		
+		//rewards from B
+        R[stateB][stateA] = 32;
+        R[stateB][stateC] = 16;
+        R[stateB][stateD] = 8;
+        
+        //rewards from C
+        
+        //rewards from D
+        R[stateD][stateC] = 32;
+        R[stateD][stateE] = 16;
+        R[stateD][stateF] = 8;
+        
+        //rewards from E
+        
+        //rewards from F
+        R[stateF][stateA] = 32;
+        R[stateF][stateB] = 16;
+        R[stateF][stateC] = 8;
+        R[stateF][stateD] = 4;
+        R[stateF][stateE] = 2;
+    }
 	
 	public void integrateObservation(Environment environment) {
 		super.integrateObservation(environment);
@@ -60,8 +92,123 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	    action[Mario.KEY_SPEED] = true;
 	}
 	
+	void runQ() {
+		/*
+        1. Set parameter , and environment reward matrix R 
+        2. Initialize matrix Q as zero matrix 
+        3. For each episode: Select random initial state 
+           Do while not reach goal state o 
+               Select one among all possible actions for the current state o 
+               Using this possible action, consider to go to the next state o 
+               Get maximum Q value of this next state based on all possible actions o 
+               Compute o Set the next state as the current state
+        */
+
+       // For each episode
+       Random rand = new Random();
+       for (int i = 0; i < 10000; i++) { // train episodes
+           // Select random initial state
+       	System.out.println();
+       	System.out.print("iteration");
+       	System.out.print(i);
+       	System.out.println();
+       	System.out.print("starting from ");
+       	System.out.println();
+       	
+           int state = rand.nextInt(statesCount);
+           System.out.print(state);
+           System.out.println();
+           while (state != stateC) // goal state
+           {
+           	
+           	System.out.print(state);
+           	
+           	// Select one among all possible actions for the current state
+               int[] actionsFromState = actions[state];
+                
+               float diceRoll = rand.nextFloat();
+               int index;
+               if (diceRoll <= epsilon) {
+               	//choose index at random
+               	index = rand.nextInt(actionsFromState.length);
+               }
+               else {
+               	//choose index with largest value
+               	index = 0;
+               	for (int j = 1; j < actionsFromState.length; ++j) {
+               		if (actionsFromState[j] > actionsFromState[index]) {
+               			index = j;
+               		}
+               	}
+               }
+               
+               int action = actionsFromState[index];
+
+               // Action outcome is set to deterministic in this example
+               // Transition probability is 1
+               // what happens when the transition is probabilistic? 
+               int nextState = action; // data structure
+
+               // Using this possible action, consider to go to the next state
+               double q = Q(state, action);
+               double maxQ = maxQ(nextState);
+               int r = R(state, action);
+
+               double value = q + alpha * (r + gamma * maxQ - q);
+               setQ(state, action, value);
+
+               // Set the next state as the current state
+               state = nextState;
+           }
+           System.out.print(state);
+       }
+    }
+	
+	double maxQ(int s) {
+        int[] actionsFromState = actions[s];
+        double maxValue = Double.MIN_VALUE;
+        for (int i = 0; i < actionsFromState.length; i++) {
+            int nextState = actionsFromState[i];
+            double value = Q[s][nextState];
+ 
+            if (value > maxValue)
+                maxValue = value;
+        }
+        return maxValue;
+    }
+	
+	// get policy from state
+    int policy(int state) {
+        int[] actionsFromState = actions[state];
+        double maxValue = Double.MIN_VALUE;
+        int policyGotoState = state; // default goto self if not found
+        for (int i = 0; i < actionsFromState.length; i++) {
+            int nextState = actionsFromState[i];
+            double value = Q[state][nextState];
+ 
+            if (value > maxValue) {
+                maxValue = value;
+                policyGotoState = nextState;
+            }
+        }
+        return policyGotoState;
+    }
+ 
+    double Q(int s, int a) {
+        return Q[s][a];
+    }
+ 
+    void setQ(int s, int a, double value) {
+        Q[s][a] = value;
+    }
+ 
+    int R(int s, int a) {
+        return R[s][a];
+    }
+	
 	
 	public boolean[] getAction() {
+		runQ();
 	    //return final results
 	    return action;
 	}
