@@ -23,7 +23,7 @@ public final class MarioEnvironment implements Environment
 {
 private int[] marioReceptiveFieldCenterPos = new int[2];
 
-private final LevelScene levelScene;
+public LevelScene levelScene;
 //    private int frame = 0;
 private MarioVisualComponent marioVisualComponent;
 private Agent agent;

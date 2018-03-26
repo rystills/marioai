@@ -96,7 +96,7 @@ public static List<Sprite> cloneList(List<Sprite> list) throws CloneNotSupported
     return clone;
 }
 
-@Override protected Object clone() throws CloneNotSupportedException 
+@Override public Object clone() throws CloneNotSupportedException 
 {
 	LevelScene c = (LevelScene) super.clone();
 	c.mario = (Mario) this.mario.clone();

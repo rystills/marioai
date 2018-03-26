@@ -1,6 +1,5 @@
 package main;
 
-import QLearningAgents.QAgent;
 import ch.idsia.benchmark.tasks.BasicTask;
 import ch.idsia.benchmark.tasks.MarioCustomSystemOfValues;
 import ch.idsia.tools.CmdLineOptions;
