@@ -38,7 +38,7 @@ private static boolean isTrace;
 
 private static boolean isMarioInvulnerable;
 
-private int status = STATUS_RUNNING;
+public int status = STATUS_RUNNING;
 // for racoon when carrying the shell
 private int prevWPic;
 private int prevxPicO;
