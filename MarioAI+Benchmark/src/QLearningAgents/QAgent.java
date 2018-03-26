@@ -26,23 +26,15 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 		try {
 			newlvl = (LevelScene)lvl.clone();
 		} catch (CloneNotSupportedException e) { }
-		System.out.println("before: " + lvl.mario.x);  
+		//jump if there will be a block in front of us in the future
+		levelScene = newlvl.getLevelSceneObservationZ(1);
+		System.out.println("before: " + levelScene[marioCenter[0]][marioCenter[1]+2]);
 		newlvl.tick();
-		System.out.println("after: " + newlvl.mario.x);
-		
-//		if (counter == 0) {
-//			//Java why :(
-//			try {
-//				oldlvl = (LevelScene)((MarioEnvironment)environment).levelScene.clone();
-//			} catch (CloneNotSupportedException e) { }
-//		}
-//		if (++counter == 10) {
-//			counter = 0;
-//			try {
-//				lvl= (LevelScene)oldlvl.clone();
-//			} catch (CloneNotSupportedException e) { }
-//			((MarioEnvironment)environment).levelScene = lvl;
-//		}
+		levelScene = newlvl.getLevelSceneObservationZ(1);
+		System.out.println("after: " + levelScene[marioCenter[0]][marioCenter[1]+2]);
+		if (levelScene[marioCenter[0]][marioCenter[1]+1] != 0) {
+			action[Mario.KEY_JUMP] = !action[Mario.KEY_JUMP];
+		};
 	}
 	
 	public void reset() {
