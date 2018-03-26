@@ -92,8 +92,8 @@ public class SmarterForwardAgentRollout extends BasicMarioAIAgent implements Age
 		System.out.println("end");
 		loadState();
 		
-		lvl.mario.status = Mario.STATUS_RUNNING;
-		GlobalOptions.isGameplayStopped = false;
+//		lvl.mario.status = Mario.STATUS_RUNNING;
+//		GlobalOptions.isGameplayStopped = false;
 		
 		super.integrateObservation(environment);
 //		System.out.println(newlvl.mario.x);

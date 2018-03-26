@@ -8,7 +8,8 @@ public final class mainQ {
 	public static void main(String[] args) {
 		//set agent and level options
 //		final String argsString = "-vis on -ld 0 -ls 0 -ag ch.idsia.agents.controllers.SmarterForwardAgent";
-		final String argsString = "-vis on -ld 0 -ls 0 -ag QLearningAgents.SmarterForwardAgentRollout";
+//		final String argsString = "-vis on -ld 0 -ls 0 -ag QLearningAgents.SmarterForwardAgentRollout";
+		final String argsString = "-vis on -ld 0 -ls 0 -ag QLearningAgents.QAgent";
 		final CmdLineOptions cmdLineOptions = new CmdLineOptions(argsString);
 	    final BasicTask basicTask = new BasicTask(cmdLineOptions);
 	
