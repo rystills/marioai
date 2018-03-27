@@ -10,6 +10,16 @@ import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 
 public class QAgent extends BasicMarioAIAgent implements Agent {
+	//persistent variables for stateful logic
+	int trueJumpCounter = 0;
+	int trueSpeedCounter = 0;
+	boolean wAppro = false;
+	boolean gAppro = false;
+	boolean eAppro = false;
+	boolean movedDown = false;
+	float prevX = 0;
+	float prevY = 0;
+	
 	//Q update vars
 	int state;
 	int selectedAction;
@@ -177,6 +187,60 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	    action = new boolean[Environment.numberOfButtons];
 	    action[Mario.KEY_RIGHT] = true;
 	    action[Mario.KEY_SPEED] = true;
+	    trueJumpCounter = 0;
+	    trueSpeedCounter = 0;
+	}
+	
+	/**
+	 * check if there is a gap immediately in front of us
+	 * @return: whether there is a gap immediately in front of us (true) or not (false)
+	 */
+	private boolean gapApproaching() {
+	    if (getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1] + 1) == 0) {
+	    	return true;
+	    }
+	    return false;
+	}
+	
+	/**
+	 * check if there is a wall 1 or 2 blocks in front of us
+	 * @return: whether there is a wall in front of us (true) or not (false)
+	 */
+	private boolean wallApproaching() {
+		if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) != 0 || 
+				getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 2) != 0) {
+	    	return true;
+	    }
+		return false;
+	}
+	
+	/**
+	 * check if there is an enemy 1 or 2 blocks in front of us
+	 * @return: whether there is an enemy in front of us (true) or not (false)
+	 */
+	private boolean enemyApproaching() {
+		for (int i = 0; i < enemiesFloatPos.length; i+=3) {
+			float ex = enemiesFloatPos[i+1];
+			//check if any enemies x vales are within a small area around mario
+			if (ex <= 48 && ex >= -16) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * check if we moved down since last frame; if so, force trueJumpCounter to 0 and stop holding jump
+	 * @return: whether or not we moved down since last frame and had trueJumpCounter > 1
+	 */
+	private boolean checkMovedDown() {
+		//ignore trueJumpCounter <=1 so we can still wallkick (as during wallslide we are slowly moving down)
+		if (marioFloatPos[1] > prevY && trueJumpCounter > 1) {
+			trueJumpCounter = 0;
+	    	action[Mario.KEY_JUMP] = false;
+	    	return true;
+		}
+		return false;
 	}
 	
 	double maxQ(int s) {
@@ -220,6 +284,25 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
     int R(int s, int a) {
         return R[s][a];
     }
+    
+    /**
+     * plug mario into one of our predefined states depending on environmental factors
+     * @return the derived state
+     */
+    public int checkState() {
+    	wAppro = wallApproaching(); 
+		eAppro = enemyApproaching();
+		gAppro = gapApproaching();
+		movedDown = checkMovedDown();
+		
+		if (isMarioOnGround) {
+			return (wAppro || eAppro || gAppro ? stateB : stateA);
+		}
+		if (movedDown) {
+			return (eAppro ? stateF : stateE);
+		}
+		return (eAppro ? stateD : stateC);
+    }
 	
 	public boolean[] getAction() {
 		///update Q table with results of action selection from last tick
@@ -233,10 +316,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         double value = q + alpha * (r + gamma * maxQ - q);
         setQ(state, selectedAction, value);
 
-        // Set the next state as the current state
-        state = nextState;
-		
-
+        //~start~
 		Random rand = new Random();
         state = checkState();
         System.out.println("state: " + state);
@@ -262,6 +342,10 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         
         selectedAction = actionsFromState[index];
         action = actionInputPairs[state][selectedAction];
+        
+        //update persistent variables
+ 	    prevX = marioFloatPos[0];
+ 	    prevY = marioFloatPos[1]; 
         
 	    //return final results
 	    return action;
