@@ -10,6 +10,9 @@ import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 
 public class QAgent extends BasicMarioAIAgent implements Agent {
+	//Q update vars
+	int state;
+	int selectedAction;
 	
 	//Q constants
 	final float epsilon = .05f;
@@ -176,78 +179,6 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	    action[Mario.KEY_SPEED] = true;
 	}
 	
-	void runQ() {
-		/*
-        1. Set parameter , and environment reward matrix R 
-        2. Initialize matrix Q as zero matrix 
-        3. For each episode: Select random initial state 
-           Do while not reach goal state o 
-               Select one among all possible actions for the current state o 
-               Using this possible action, consider to go to the next state o 
-               Get maximum Q value of this next state based on all possible actions o 
-               Compute o Set the next state as the current state
-        */
-
-       // For each episode
-       Random rand = new Random();
-       for (int i = 0; i < 10000; i++) { // train episodes
-           // Select random initial state
-       	System.out.println();
-       	System.out.print("iteration");
-       	System.out.print(i);
-       	System.out.println();
-       	System.out.print("starting from ");
-       	System.out.println();
-       	
-           int state = rand.nextInt(statesCount);
-           System.out.print(state);
-           System.out.println();
-           while (state != stateC) // goal state
-           {
-           	
-           	System.out.print(state);
-           	
-           	// Select one among all possible actions for the current state
-               int[] actionsFromState = actions[state];
-                
-               float diceRoll = rand.nextFloat();
-               int index;
-               if (diceRoll <= epsilon) {
-               	//choose index at random
-               	index = rand.nextInt(actionsFromState.length);
-               }
-               else {
-               	//choose index with largest value
-               	index = 0;
-               	for (int j = 1; j < actionsFromState.length; ++j) {
-               		if (actionsFromState[j] > actionsFromState[index]) {
-               			index = j;
-               		}
-               	}
-               }
-               
-               int action = actionsFromState[index];
-
-               // Action outcome is set to deterministic in this example
-               // Transition probability is 1
-               // what happens when the transition is probabilistic? 
-               int nextState = action; // data structure
-
-               // Using this possible action, consider to go to the next state
-               double q = Q(state, action);
-               double maxQ = maxQ(nextState);
-               int r = R(state, action);
-
-               double value = q + alpha * (r + gamma * maxQ - q);
-               setQ(state, action, value);
-
-               // Set the next state as the current state
-               state = nextState;
-           }
-           System.out.print(state);
-       }
-    }
-	
 	double maxQ(int s) {
         int[] actionsFromState = actions[s];
         double maxValue = Double.MIN_VALUE;
@@ -290,9 +221,48 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         return R[s][a];
     }
 	
-	
 	public boolean[] getAction() {
-		runQ();
+		///update Q table with results of action selection from last tick
+		int nextState = selectedAction; // data structure
+
+        // Using this possible action, consider to go to the next state
+        double q = Q(state, selectedAction);
+        double maxQ = maxQ(nextState);
+        int r = R(state, selectedAction);
+
+        double value = q + alpha * (r + gamma * maxQ - q);
+        setQ(state, selectedAction, value);
+
+        // Set the next state as the current state
+        state = nextState;
+		
+
+		Random rand = new Random();
+        state = checkState();
+        System.out.println("state: " + state);
+    
+    	// Select one among all possible actions for the current state
+        int[] actionsFromState = actions[state];
+         
+        float diceRoll = rand.nextFloat();
+        int index;
+        if (diceRoll <= epsilon) {
+        	//choose index at random
+        	index = rand.nextInt(actionsFromState.length);
+        }
+        else {
+        	//choose index with largest value
+        	index = 0;
+        	for (int j = 1; j < actionsFromState.length; ++j) {
+        		if (actionsFromState[j] > actionsFromState[index]) {
+        			index = j;
+        		}
+        	}
+        }
+        
+        selectedAction = actionsFromState[index];
+        action = actionInputPairs[state][selectedAction];
+        
 	    //return final results
 	    return action;
 	}
