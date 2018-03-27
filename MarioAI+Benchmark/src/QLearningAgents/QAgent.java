@@ -45,17 +45,101 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
     int[] actionsFromF = new int[] { stateA, stateB, stateC, stateD, stateE, stateF };
     int[][] actions = new int[][] { actionsFromA, actionsFromB, actionsFromC,
             actionsFromD, actionsFromE, actionsFromF };
+            
+    //input-action correspondance (not sure on this one)
+    boolean actionInputPairs[][][] = new boolean[statesCount][6][Environment.numberOfButtons];
 	
     //reward & Q tables
 	int[][] R = new int[statesCount][statesCount]; // reward lookup
-	double[][] Q = new double[statesCount][statesCount]; // Q learning
+	double[][] Q = new double[statesCount][statesCount]; // Q values
             
 	public QAgent() {
 	    super("QAgent");
 	    reset();
 	    initRewards();
+	    initInputPairs();
 	}
 	
+	public void initInputPairs() {
+		//inputs from A
+		actionInputPairs[stateA][stateA][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateA][stateA][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateA][stateB][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateA][stateB][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateA][stateC][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateA][stateC][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateA][stateC][Mario.KEY_JUMP] = true;
+		actionInputPairs[stateA][stateD][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateA][stateD][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateA][stateD][Mario.KEY_JUMP] = true;
+		
+		//inputs from B
+		actionInputPairs[stateB][stateA][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateB][stateA][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateB][stateB][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateB][stateB][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateB][stateC][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateB][stateC][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateB][stateC][Mario.KEY_JUMP] = true;
+		actionInputPairs[stateB][stateD][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateB][stateD][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateB][stateD][Mario.KEY_JUMP] = true;
+		
+		//inputs from C
+		actionInputPairs[stateC][stateC][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateC][stateC][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateC][stateC][Mario.KEY_JUMP] = true;
+		actionInputPairs[stateC][stateD][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateC][stateD][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateC][stateD][Mario.KEY_JUMP] = true;
+		actionInputPairs[stateC][stateE][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateC][stateE][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateC][stateF][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateC][stateF][Mario.KEY_RIGHT] = true;
+		
+		//inputs from D
+		actionInputPairs[stateD][stateC][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateD][stateC][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateD][stateC][Mario.KEY_JUMP] = true;
+		actionInputPairs[stateD][stateD][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateD][stateD][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateD][stateD][Mario.KEY_JUMP] = true;
+		actionInputPairs[stateD][stateE][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateD][stateE][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateD][stateF][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateD][stateF][Mario.KEY_RIGHT] = true;
+		
+		//inputs from E
+		actionInputPairs[stateE][stateA][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateE][stateA][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateE][stateB][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateE][stateB][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateE][stateE][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateE][stateE][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateE][stateF][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateE][stateF][Mario.KEY_RIGHT] = true;
+		
+		//inputs from F
+		actionInputPairs[stateF][stateA][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateF][stateA][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateF][stateB][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateF][stateB][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateF][stateC][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateF][stateC][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateF][stateC][Mario.KEY_JUMP] = true;
+		actionInputPairs[stateF][stateD][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateF][stateD][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateF][stateD][Mario.KEY_JUMP] = true;
+		actionInputPairs[stateF][stateE][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateF][stateE][Mario.KEY_RIGHT] = true;
+		actionInputPairs[stateF][stateF][Mario.KEY_SPEED] = true;
+		actionInputPairs[stateF][stateF][Mario.KEY_RIGHT] = true;
+		
+	}
+	
+	/**
+	 * set appropriate rewards for transitioning from each state to each other possible state
+	 */
 	public void initRewards() {
 		//rewards from A
 		
