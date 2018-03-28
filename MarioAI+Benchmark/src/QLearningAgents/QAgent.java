@@ -327,7 +327,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
     float R(int s, int a) {
     	//negatively reward releasing A when aerial for less than 17 frames
     	if ((!action[Mario.KEY_JUMP]) && (!isMarioOnGround) && trueJumpCounter < 17 && (movedUp())) {
-    		System.out.println("~punishment~");
+//    		System.out.println("~punishment~");
     		return -64;
     	}
     	
@@ -370,7 +370,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         //~start Q~
         state = checkState();
         //System.out.println("state: " + state);
-        printResult();
+        //printResult();
     
     	// Select one among all possible actions for the current state
         int[] actionsFromState = actions[state];
