@@ -21,6 +21,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	boolean gAppro = false;
 	boolean eAppro = false;
 	boolean movedDown = false;
+	boolean wasGrounded = false;
 	float prevX = 0;
 	float prevY = 0;
 	
@@ -193,6 +194,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	    action[Mario.KEY_SPEED] = true;
 	    trueJumpCounter = 0;
 	    trueSpeedCounter = 0;
+	    wasGrounded = false;
 	}
 	
 	/**
@@ -324,7 +326,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
      */
     float R(int s, int a) {
     	//negatively reward releasing A when aerial for less than 17 frames
-    	if ((!action[Mario.KEY_JUMP]) && (!isMarioOnGround) && trueJumpCounter < 17 && (!movedUp())) {
+    	if ((!action[Mario.KEY_JUMP]) && (!wasGrounded) && trueJumpCounter < 17 && (!movedUp())) {
     		return -64;
     	}
     	
@@ -343,7 +345,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 		gAppro = gapApproaching();
 		movedDown = checkMovedDown();
 		
-		if (isMarioOnGround) {
+		if (wasGrounded) {
 			return (wAppro || eAppro || gAppro ? stateB : stateA);
 		}
 		if (movedDown) {
@@ -401,7 +403,11 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
  	    	++trueJumpCounter;
  	    }
  	    if (isMarioOnGround) {
+ 	    	wasGrounded = true;
  	    	trueJumpCounter = 0;
+ 	    }
+ 	    else {
+ 	    	wasGrounded = false;
  	    }
         
 	    //return final results
