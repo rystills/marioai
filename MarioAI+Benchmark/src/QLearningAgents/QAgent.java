@@ -1,5 +1,6 @@
 package QLearningAgents;
 
+import java.text.DecimalFormat;
 import java.util.Random;
 
 import ch.idsia.agents.Agent;
@@ -10,6 +11,9 @@ import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.benchmark.mario.environments.MarioEnvironment;
 
 public class QAgent extends BasicMarioAIAgent implements Agent {
+	final DecimalFormat df = new DecimalFormat("#.##");
+	Random rand = new Random();
+	
 	//persistent variables for stateful logic
 	int trueJumpCounter = 0;
 	int trueSpeedCounter = 0;
@@ -22,7 +26,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	
 	//Q update vars
 	int state;
-	int selectedAction;
+	int selectedAction = 0;
 	
 	//Q constants
 	final float epsilon = .05f;
@@ -243,6 +247,14 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 		return false;
 	}
 	
+	private boolean movedUp() {
+		return marioFloatPos[1] < prevY;
+	}
+	
+	private boolean movedRight() {
+		return marioFloatPos[0] > prevX;
+	}
+	
 	double maxQ(int s) {
         int[] actionsFromState = actions[s];
         double maxValue = Double.MIN_VALUE;
@@ -254,6 +266,17 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
                 maxValue = value;
         }
         return maxValue;
+    }
+	
+	void printResult() {
+        System.out.println("Print result");
+        for (int i = 0; i < Q.length; i++) {
+            System.out.print("out from " + stateNames[i] + ":  ");
+            for (int j = 0; j < Q[i].length; j++) {
+                System.out.print(df.format(Q[i][j]) + " ");
+            }
+            System.out.println();
+        }
     }
 	
 	// get policy from state
@@ -281,8 +304,16 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         Q[s][a] = value;
     }
  
+    /**
+     * calculate the reward
+     * @param s state
+     * @param a action
+     * @return corresponding reward
+     */
     int R(int s, int a) {
-        return R[s][a];
+    	//reward is a factor of new state reward value dependent on vert/horiz progress
+    	int rewardMultiplicity = (movedUp()?1:0) + (movedRight()?1:0)*2;
+        return rewardMultiplicity * R[s][a];
     }
     
     /**
@@ -317,9 +348,9 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         setQ(state, selectedAction, value);
 
         //~start~
-		Random rand = new Random();
         state = checkState();
-        System.out.println("state: " + state);
+        //System.out.println("state: " + state);
+        printResult();
     
     	// Select one among all possible actions for the current state
         int[] actionsFromState = actions[state];
