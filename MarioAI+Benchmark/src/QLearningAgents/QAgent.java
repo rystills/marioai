@@ -312,7 +312,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
      */
     int R(int s, int a) {
     	//reward is a factor of new state reward value dependent on vert/horiz progress
-    	int rewardMultiplicity = (movedUp()?1:0) + (movedRight()?1:0)*2;
+    	int rewardMultiplicity = (movedUp()?1:0) + (movedRight()?2:0);
         return rewardMultiplicity * R[s][a];
     }
     
@@ -337,7 +337,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	
 	public boolean[] getAction() {
 		///update Q table with results of action selection from last tick
-		int nextState = selectedAction; // data structure
+		int nextState = checkState();
 
         // Using this possible action, consider to go to the next state
         double q = Q(state, selectedAction);
