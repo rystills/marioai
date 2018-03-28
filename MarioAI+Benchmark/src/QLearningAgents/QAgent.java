@@ -247,6 +247,14 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 		return false;
 	}
 	
+	private float verticalMovement() {
+		return prevY - marioFloatPos[1];
+	}
+	
+	private float horizontalMovement() {
+		return marioFloatPos[0] - prevX;
+	}
+	
 	private boolean movedUp() {
 		return marioFloatPos[1] < prevY;
 	}
@@ -310,9 +318,10 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
      * @param a action
      * @return corresponding reward
      */
-    int R(int s, int a) {
+    float R(int s, int a) {
     	//reward is a factor of new state reward value dependent on vert/horiz progress
-    	int rewardMultiplicity = (movedUp()?1:0) + (movedRight()?2:0);
+    	//int rewardMultiplicity = (movedUp()?1:0) + (movedRight()?2:0);
+    	float rewardMultiplicity = verticalMovement()*.25f + horizontalMovement()*.5f;
         return rewardMultiplicity * R[s][a];
     }
     
@@ -342,7 +351,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         // Using this possible action, consider to go to the next state
         double q = Q(state, selectedAction);
         double maxQ = maxQ(nextState);
-        int r = R(state, selectedAction);
+        float r = R(state, selectedAction);
 
         double value = q + alpha * (r + gamma * maxQ - q);
         setQ(state, selectedAction, value);
