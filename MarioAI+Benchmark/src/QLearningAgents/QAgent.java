@@ -24,10 +24,12 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	boolean wasGrounded = false;
 	float prevX = 0;
 	float prevY = 0;
+	boolean isSarsa = true;
 	
 	//Q update vars
 	int state;
-	int selectedAction = 0;
+	int selectedAction;
+	int prevState; 
 	
 	//Q constants
 	final float epsilon = .05f;
@@ -195,6 +197,8 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	    trueJumpCounter = 0;
 	    trueSpeedCounter = 0;
 	    wasGrounded = false;
+	    selectedAction = 0;
+	    prevState = -1;
 	}
 	
 	/**
@@ -282,8 +286,8 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         return maxValue;
     }
 	
-	void printResult() {
-        System.out.println("Print result");
+	public void printResult() {
+        System.out.println("Q Table:");
         for (int i = 0; i < Q.length; i++) {
             System.out.print("out from " + stateNames[i] + ":  ");
             for (int j = 0; j < Q[i].length; j++) {
@@ -367,6 +371,17 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         double value = q + alpha * (r + gamma * maxQ - q);
         setQ(state, selectedAction, value);
 
+        //propogate reward back when in SARSA
+        if (isSarsa) {
+        	if (prevState != -1) {
+        		q = Q(prevState, selectedAction);
+                r = R(state, selectedAction);
+                value = q + alpha * (r + gamma * maxQ - q);
+                setQ(prevState, selectedAction, value);
+        	}
+        	prevState = state;
+        }
+        
         //~start Q~
         state = checkState();
         //System.out.println("state: " + state);

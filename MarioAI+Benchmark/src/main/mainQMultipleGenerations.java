@@ -30,6 +30,7 @@ public final class mainQMultipleGenerations {
         
         for (int gen = 0; gen < generations; gen++) {
             System.out.println("results of simulation " + gen + ": " + t.simulate());
+            ((QAgent)a).printResult();
         }
         //run the final version of our evolved agent
 		System.out.println("Showing results of training after " + generations + " generations...");
