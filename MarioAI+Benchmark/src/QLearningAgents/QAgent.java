@@ -259,6 +259,10 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 		return marioFloatPos[1] < prevY;
 	}
 	
+	private boolean movedDown() {
+		return marioFloatPos[1] > prevY;
+	}
+	
 	private boolean movedRight() {
 		return marioFloatPos[0] > prevX;
 	}
@@ -319,8 +323,12 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
      * @return corresponding reward
      */
     float R(int s, int a) {
-    	//reward is a factor of new state reward value dependent on vert/horiz progress
-    	//int rewardMultiplicity = (movedUp()?1:0) + (movedRight()?2:0);
+    	//negatively reward releasing A when aerial for less than 17 frames
+    	if ((!action[Mario.KEY_JUMP]) && (!isMarioOnGround) && trueJumpCounter < 17 && (!movedUp())) {
+    		return -64;
+    	}
+    	
+    	//default reward is a factor of new state reward value dependent on vert/horiz progress
     	float rewardMultiplicity = verticalMovement()*.25f + horizontalMovement()*.5f;
         return rewardMultiplicity * R[s][a];
     }
@@ -382,10 +390,19 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         
         selectedAction = actionsFromState[index];
         action = actionInputPairs[state][selectedAction];
+        System.out.println("action: " + action[Mario.KEY_JUMP]);
         
         //update persistent variables
  	    prevX = marioFloatPos[0];
  	    prevY = marioFloatPos[1]; 
+ 	    
+ 	    //update jump counter
+ 	    if (action[Mario.KEY_JUMP]) {
+ 	    	++trueJumpCounter;
+ 	    }
+ 	    if (isMarioOnGround) {
+ 	    	trueJumpCounter = 0;
+ 	    }
         
 	    //return final results
 	    return action;
