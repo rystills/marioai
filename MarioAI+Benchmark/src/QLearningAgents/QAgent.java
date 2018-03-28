@@ -326,7 +326,8 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
      */
     float R(int s, int a) {
     	//negatively reward releasing A when aerial for less than 17 frames
-    	if ((!action[Mario.KEY_JUMP]) && (!wasGrounded) && trueJumpCounter < 17 && (!movedUp())) {
+    	if ((!action[Mario.KEY_JUMP]) && (!isMarioOnGround) && trueJumpCounter < 17 && (movedUp())) {
+    		System.out.println("~punishment~");
     		return -64;
     	}
     	
@@ -343,7 +344,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
     	wAppro = wallApproaching(); 
 		eAppro = enemyApproaching();
 		gAppro = gapApproaching();
-		movedDown = checkMovedDown();
+		movedDown = movedDown();
 		
 		if (wasGrounded) {
 			return (wAppro || eAppro || gAppro ? stateB : stateA);
@@ -366,7 +367,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         double value = q + alpha * (r + gamma * maxQ - q);
         setQ(state, selectedAction, value);
 
-        //~start~
+        //~start Q~
         state = checkState();
         //System.out.println("state: " + state);
         printResult();
@@ -392,11 +393,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
         
         selectedAction = actionsFromState[index];
         action = actionInputPairs[state][selectedAction];
-        System.out.println("action: " + action[Mario.KEY_JUMP]);
-        
-        //update persistent variables
- 	    prevX = marioFloatPos[0];
- 	    prevY = marioFloatPos[1]; 
+        //~end Q~
  	    
  	    //update jump counter
  	    if (action[Mario.KEY_JUMP]) {
@@ -409,6 +406,17 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
  	    else {
  	    	wasGrounded = false;
  	    }
+	   
+ 	    //toggle jump on if we are rising (nearly always beneficial so can be hard-coded as positive)
+ 	    if (movedUp()) {
+ 	    	action[Mario.KEY_JUMP] = true;
+ 	    }
+ 	    
+ 	    //update persistent variables
+ 	    prevX = marioFloatPos[0];
+ 	    prevY = marioFloatPos[1]; 
+ 	    
+ 	    //checkMovedDown();
         
 	    //return final results
 	    return action;
