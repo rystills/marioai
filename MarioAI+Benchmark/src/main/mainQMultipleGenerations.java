@@ -8,7 +8,7 @@ import ch.idsia.benchmark.tasks.ProgressTask;
 import ch.idsia.tools.CmdLineOptions;
 
 public final class mainQMultipleGenerations {
-    final static int generations = 1000;
+    final static int generations = 10;
     
 	public static void main(String[] args) {		
 		//prepare options for training
@@ -26,7 +26,7 @@ public final class mainQMultipleGenerations {
         
         //train
         for (int gen = 0; gen < generations; gen++) {
-            System.out.println("results of simulation " + gen + ": " + t.simulate());
+            System.out.print("results of simulation " + gen + ": ");
             ((QAgent)a).printResult();
         }
         

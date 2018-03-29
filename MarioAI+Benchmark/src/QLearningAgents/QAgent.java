@@ -32,8 +32,9 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	int prevState; 
 	
 	//Q constants
-	float epsilon = .05f;
 	boolean scalingEpsilon = false;
+	//if we are using scaling epsilon, start with a larger value so that we can shrink over time
+	float epsilon = (scalingEpsilon ? .1f : .05f);
 	
 	// path finding
     final double alpha = 0.1;
@@ -383,6 +384,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
     	//default reward is a factor of new state reward value dependent on vert/horiz progress
     	float rewardMultiplicity = verticalMovement()*.25f + horizontalMovement()*.5f;
         return rewardMultiplicity * Math.min(R[s][a],1);
+    	//return rewardMultiplicity * R[s][a];
     }
     
     /**
