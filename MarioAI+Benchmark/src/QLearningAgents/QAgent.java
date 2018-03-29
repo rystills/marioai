@@ -24,7 +24,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	boolean wasGrounded = false;
 	float prevX = 0;
 	float prevY = 0;
-	boolean isSarsa = true;
+	boolean isSarsa;
 	
 	//Q update vars
 	int state;
@@ -32,7 +32,8 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	int prevState; 
 	
 	//Q constants
-	final float epsilon = .05f;
+	float epsilon = .05f;
+	boolean scalingEpsilon = false;
 	
 	// path finding
     final double alpha = 0.1;
@@ -73,11 +74,12 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	int[][] R = new int[statesCount][statesCount]; // reward lookup
 	double[][] Q = new double[statesCount][statesCount]; // Q values
             
-	public QAgent() {
+	public QAgent(boolean isSarsa) {
 	    super("QAgent");
 	    reset();
 	    initRewards();
 	    initInputPairs();
+	    this.isSarsa = isSarsa;
 	}
 	
 	public void initInputPairs() {
@@ -199,6 +201,10 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	    wasGrounded = false;
 	    selectedAction = 0;
 	    prevState = -1;
+	  //scale epsilon down, if desired
+ 	    if (scalingEpsilon) {
+ 	    	epsilon *= .99f;
+ 	    }
 	}
 	
 	/**
@@ -376,7 +382,7 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
     	
     	//default reward is a factor of new state reward value dependent on vert/horiz progress
     	float rewardMultiplicity = verticalMovement()*.25f + horizontalMovement()*.5f;
-        return rewardMultiplicity * R[s][a];
+        return rewardMultiplicity * Math.min(R[s][a],1);
     }
     
     /**

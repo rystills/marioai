@@ -15,12 +15,12 @@ public final class mainQMultipleGenerations {
 		CmdLineOptions options = new CmdLineOptions(new String[0]);
         options.setPauseWorld(false);
         options.setFPS(GlobalOptions.MaxFPS);
-        options.setLevelDifficulty(0); //change level difficulty
-        options.setLevelRandSeed(0); //change level seed
+        options.setLevelDifficulty(25); //change level difficulty
+        options.setLevelRandSeed(2); //change level seed
         options.setVisualization(false);
         
         //init agent and training environment
-        Agent a = new QAgent();
+        Agent a = new QAgent(false);
         ProgressTask task = new ProgressTask(options); //defines fitness function
         Trainer t = new Trainer(task,a);
         
