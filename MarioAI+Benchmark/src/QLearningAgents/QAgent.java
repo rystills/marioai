@@ -205,12 +205,36 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	 * check if there is a gap immediately in front of us
 	 * @return: whether there is a gap immediately in front of us (true) or not (false)
 	 */
-	private boolean gapApproaching() {
+	private boolean gapApproachingClose() {
 	    if (getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1] + 1) == 0) {
 	    	return true;
 	    }
 	    return false;
 	}
+	
+	/**
+	 * check if there is a gap in front of us
+	 * @return: whether there is a gap immediately in front of us (true) or not (false)
+	 */
+	private boolean gapApproaching() {
+	    if (getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1] + 1) == 0 ||
+	    		getReceptiveFieldCellValue(marioCenter[0] + 1, marioCenter[1] + 2) == 0) {
+	    	return true;
+	    }
+	    return false;
+	}
+	
+	/**
+	 * check if there is a wall immediately blocks in front of us
+	 * @return: whether there is a wall in front of us (true) or not (false)
+	 */
+	private boolean wallApproachingClose() {
+		if (getReceptiveFieldCellValue(marioCenter[0], marioCenter[1] + 1) != 0) {
+			return true;
+		}
+		return false;
+	}
+		
 	
 	/**
 	 * check if there is a wall 1 or 2 blocks in front of us
@@ -225,14 +249,29 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
 	}
 	
 	/**
-	 * check if there is an enemy 1 or 2 blocks in front of us
+	 * check if there is an enemy immediately in front of us
+	 * @return: whether there is an enemy in front of us (true) or not (false)
+	 */
+	private boolean enemyApproachingClose() {
+		for (int i = 0; i < enemiesFloatPos.length; i+=3) {
+			float ex = enemiesFloatPos[i+1];
+			//check if any enemies x vales are within a small area around mario
+			if (ex <= 32 && ex >= -12) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * check if there is an enemy in front of us
 	 * @return: whether there is an enemy in front of us (true) or not (false)
 	 */
 	private boolean enemyApproaching() {
 		for (int i = 0; i < enemiesFloatPos.length; i+=3) {
 			float ex = enemiesFloatPos[i+1];
 			//check if any enemies x vales are within a small area around mario
-			if (ex <= 48 && ex >= -16) {
+			if (ex <= 64 && ex >= -16) {
 				return true;
 			}
 		}
@@ -345,9 +384,9 @@ public class QAgent extends BasicMarioAIAgent implements Agent {
      * @return the derived state
      */
     public int checkState() {
-    	wAppro = wallApproaching(); 
-		eAppro = enemyApproaching();
-		gAppro = gapApproaching();
+    	wAppro = wallApproachingClose(); 
+		eAppro = enemyApproachingClose();
+		gAppro = gapApproachingClose();
 		movedDown = movedDown();
 		
 		if (wasGrounded) {

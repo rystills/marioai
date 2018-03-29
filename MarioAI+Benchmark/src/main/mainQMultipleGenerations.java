@@ -4,16 +4,11 @@ import ch.idsia.agents.Agent;
 import QLearningAgents.QAgent;
 import QLearningAgents.Trainer;
 import ch.idsia.benchmark.mario.engine.GlobalOptions;
-import ch.idsia.benchmark.tasks.BasicTask;
-import ch.idsia.benchmark.tasks.MarioCustomSystemOfValues;
 import ch.idsia.benchmark.tasks.ProgressTask;
-import ch.idsia.evolution.Evolvable;
-import ch.idsia.evolution.ea.SmarterES;
 import ch.idsia.tools.CmdLineOptions;
-import ch.idsia.utils.wox.serial.Easy;
 
 public final class mainQMultipleGenerations {
-    final static int generations = 100;
+    final static int generations = 1000;
     
 	public static void main(String[] args) {		
 		//prepare options for training
@@ -24,15 +19,18 @@ public final class mainQMultipleGenerations {
         options.setLevelRandSeed(0); //change level seed
         options.setVisualization(false);
         
+        //init agent and training environment
         Agent a = new QAgent();
         ProgressTask task = new ProgressTask(options); //defines fitness function
         Trainer t = new Trainer(task,a);
         
+        //train
         for (int gen = 0; gen < generations; gen++) {
             System.out.println("results of simulation " + gen + ": " + t.simulate());
             ((QAgent)a).printResult();
         }
-        //run the final version of our evolved agent
+        
+        //run the final version of our trained agent
 		System.out.println("Showing results of training after " + generations + " generations...");
 		options.setFPS(24);
 		options.setVisualization(true);
